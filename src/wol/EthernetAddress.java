@@ -1,8 +1,9 @@
 /*
- * $Id: EthernetAddress.java,v 1.1 2004/04/15 22:57:57 gon23 Exp $
+ * $Id: EthernetAddress.java,v 1.2 2004/04/16 09:25:46 gon23 Exp $
  */
 package wol;
 
+import java.util.Arrays;
 import java.util.StringTokenizer;
 
 /**
@@ -26,7 +27,8 @@ public class EthernetAddress {
 	 * <br>
 	 * E.g.: 00:50:95:10:95:F5
 	 * @param ethernetAddress the ethernet address
-	 * @throws IllegalArgumentException if the ethernet address could not be parsed 
+	 * @throws IllegalArgumentException if the ethernet address could not be parsed
+	 * @throws NullPointerException if the ethernet address is null  
 	 */
 	public EthernetAddress(String ethernetAddress) throws IllegalEthernetAddressException {
 		super();
@@ -39,6 +41,7 @@ public class EthernetAddress {
 	 * 
 	 * @param bytes the bytes. Must have length of 6!
 	 * @throws IllegalEthernetAddressException if ethernet address is of illegal length or null
+	 * @throws NullPointerException if the ethernet address is null
 	 */
 	public EthernetAddress(byte[] ethernetAddress) throws IllegalEthernetAddressException {
 		super();
@@ -47,7 +50,10 @@ public class EthernetAddress {
 			throw new IllegalEthernetAddressException("An ethernet address must be 6 bytes");
 		}
 		
-		this.bytes = ethernetAddress;
+		 
+		byte[] copyBytes = new byte[ethernetAddress.length]; 
+		System.arraycopy(ethernetAddress, 0, copyBytes, 0, ethernetAddress.length);
+		this.bytes = copyBytes;
 	}
 	
 	/**
@@ -69,7 +75,9 @@ public class EthernetAddress {
 		
 		try {
 			for(int i=0; i < 6; i++) {
-				ethernetAddressBytes[i] = (byte) Integer.parseInt(tokenizer.nextToken(), 16);
+				String byteToken = tokenizer.nextToken();
+				
+				ethernetAddressBytes[i] = (byte)Integer.parseInt(byteToken, 16);
 			}
 		} catch (NumberFormatException e) {
 			throw new IllegalEthernetAddressException(ethernetAddress + " is not a legal hardwareaddress");
@@ -84,12 +92,66 @@ public class EthernetAddress {
 	 * @return the bytes
 	 */
 	public byte[] toBytes() {
-		return bytes;
+		byte[] copy = new byte[this.bytes.length];
+		System.arraycopy(this.bytes, 0, copy, 0, this.bytes.length);
+		
+		return copy;
+	}
+	
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		
+		if (null == obj) {
+			return false;
+		}
+		
+		if (EthernetAddress.class == obj.getClass()) {
+			EthernetAddress other = (EthernetAddress) obj;
+			
+			return Arrays.equals(this.bytes, other.bytes);
+		}
+		
+		return false;
+	}
+	
+	public String toString() {
+		StringBuffer buffer = new StringBuffer();
+		
+		for (int i = 0; i < this.bytes.length; i++) {
+			byte b = this.bytes[i];
+			
+			buffer.append(byteToHexString(b));
+			
+			if (i < this.bytes.length-1) {
+				buffer.append(EthernetAddress.ETHERNET_ADDRESS_DELIM);
+			}
+		}
+		
+		return buffer.toString();
+	}
+	
+	protected String byteToHexString(byte b) {
+		return Integer.toString((b & 0xff) + 0x100, 16).substring(1).toUpperCase();
+	}
+	
+	public int hashCode() {
+		int hash = 734;
+		
+		for (int i = 0; i < bytes.length; i++) {
+			hash  += bytes[i];
+		}
+		
+		return hash;
 	}
 }
 
 /*
  * $Log: EthernetAddress.java,v $
+ * Revision 1.2  2004/04/16 09:25:46  gon23
+ * addded equals, hashCode and toString
+ *
  * Revision 1.1  2004/04/15 22:57:57  gon23
  * *** empty log message ***
  *
