@@ -16,7 +16,6 @@
   </security>
   <resources>
     <j2se version="1.4.2"/>
-    <jar href="lib/JSAP_1.03a.jar"/>
   </resources>
   <application-desc main-class="wol.WakeOnLan"/>
 </jnlp> 
