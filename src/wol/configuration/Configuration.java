@@ -1,5 +1,5 @@
 /*
- * $Id: Configuration.java,v 1.2 2004/04/14 18:21:39 gon23 Exp $
+ * $Id: Configuration.java,v 1.3 2004/04/14 22:14:49 gon23 Exp $
  */
 package wol.configuration;
 
@@ -11,7 +11,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+/**
+ * @author <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#115;&#46;&#109;&#111;&#108;&#100;&#97;&#110;&#101;&#114;&#64;&#103;&#109;&#120;&#46;&#110;&#101;&#116;">Steffen Moldaner</a>
+ */
 public class Configuration {
 	private final static Logger LOG = Logger.getLogger(Configuration.class.getName());
 	private Host[] hosts;
@@ -79,6 +81,9 @@ public class Configuration {
 
 /*
  * $Log: Configuration.java,v $
+ * Revision 1.3  2004/04/14 22:14:49  gon23
+ * *** empty log message ***
+ *
  * Revision 1.2  2004/04/14 18:21:39  gon23
  * *** empty log message ***
  *

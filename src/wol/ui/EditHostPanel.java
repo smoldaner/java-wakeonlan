@@ -1,5 +1,5 @@
 /*
- * $Id: EditHostPanel.java,v 1.3 2004/04/14 21:52:30 gon23 Exp $
+ * $Id: EditHostPanel.java,v 1.4 2004/04/14 22:14:49 gon23 Exp $
  */
 package wol.ui;
 
@@ -22,6 +22,9 @@ import javax.swing.SwingUtilities;
 import wol.Errors;
 import wol.configuration.*;
 
+/**
+ * @author <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#115;&#46;&#109;&#111;&#108;&#100;&#97;&#110;&#101;&#114;&#64;&#103;&#109;&#120;&#46;&#110;&#101;&#116;">Steffen Moldaner</a>
+ */
 public class EditHostPanel extends JPanel {
 	private javax.swing.JLabel nameLabel = null;
 	private javax.swing.JTextField nameTextField = null;
@@ -512,6 +515,9 @@ public class EditHostPanel extends JPanel {
 
 /*
  * $Log: EditHostPanel.java,v $
+ * Revision 1.4  2004/04/14 22:14:49  gon23
+ * *** empty log message ***
+ *
  * Revision 1.3  2004/04/14 21:52:30  gon23
  * *** empty log message ***
  *
