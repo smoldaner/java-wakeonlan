@@ -1,5 +1,5 @@
 /*
- * $Id: WakeOnLanApplet.java,v 1.1 2004/04/08 22:10:06 gon23 Exp $
+ * $Id: WakeOnLanApplet.java,v 1.2 2004/04/14 11:13:08 gon23 Exp $
  */
 package wol;
 
@@ -27,7 +27,6 @@ public class WakeOnLanApplet extends JApplet {
 	 * @return void
 	 */
 	public void init() {
-		this.setSize(300, 200);
 		this.setContentPane(getJContentPane());
 	}
 	/**
@@ -46,6 +45,9 @@ public class WakeOnLanApplet extends JApplet {
 
 /*
  * $Log: WakeOnLanApplet.java,v $
+ * Revision 1.2  2004/04/14 11:13:08  gon23
+ * *** empty log message ***
+ *
  * Revision 1.1  2004/04/08 22:10:06  gon23
  * Initial
  *

@@ -1,17 +1,32 @@
 /*
- * $Id: WakeOnLan.java,v 1.2 2003/09/24 15:30:18 gon23 Exp $
+ * $Id: WakeOnLan.java,v 1.3 2004/04/14 11:13:08 gon23 Exp $
  */
 package wol;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.swing.BorderFactory;
+import javax.swing.JFrame;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -20,6 +35,10 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+
+import wol.configuration.Configuration;
+import wol.configuration.Host;
+import wol.ui.MainPanel;
 
 /**
  * The only purpose of this class is to wake up a machine from the commandline
@@ -31,6 +50,7 @@ import org.apache.commons.cli.PosixParser;
 public class WakeOnLan {
 	private final static String VERSION = "0.3.0";
 	private final static String VERSIONSTRING = "wakeonlan version " + VERSION;
+	private final static Logger LOG = Logger.getLogger(WakeOnLan.class.getName());
 
 	private ResourceBundle bundle = ResourceBundle.getBundle("wol.Resources");
 	private Options options;
@@ -87,12 +107,14 @@ public class WakeOnLan {
 			}
 			
 			if (null == hardwareAddresses || 0 == hardwareAddresses.length) {
-				printErrorAndExit(bundle.getString("error.arguments.missing"), null, debug);
+				showGUI();
+			} else {
+				WakeUpUtil wakeOnLan = new WakeUpUtil(host, port);
+			
+				wakeOnLan.wakeUp(hardwareAddresses);
 			}
 			
-			WakeUpUtil wakeOnLan = new WakeUpUtil(host, port);
-			
-			wakeOnLan.wakeUp(hardwareAddresses);				
+							
 		} catch (ParseException e) {
 			printErrorAndExit(bundle.getString("error.parsingCommandline"), e, debug);
 			System.exit(1);
@@ -109,6 +131,74 @@ public class WakeOnLan {
 		}
 	}
 
+	private void showGUI() {
+		JFrame frame = new JFrame("Wakeonlan");
+		final Configuration config  = readConfig();
+		final MainPanel mainPanel = new MainPanel(config);
+		
+		mainPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+		frame.setContentPane(mainPanel);
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				writeConfig(config);
+				System.exit(0);
+			}
+		});
+		frame.pack();
+		frame.show();
+	}
+	
+	private Configuration readConfig() {
+		File hostsFile = getHostsFile();
+		
+		try {
+			if (hostsFile.exists()) {
+				FileInputStream fis = new FileInputStream(hostsFile);
+				XMLDecoder decoder = new XMLDecoder(fis);
+			
+				Configuration config = (Configuration) decoder.readObject();
+				LOG.info("using hosts-file: " + hostsFile.getAbsolutePath());
+				
+				return config;
+			}
+		} catch (FileNotFoundException e) {
+			String errMsg = "Could not read hosts-file: " + hostsFile.getAbsolutePath();
+			
+			if (LOG.isLoggable(Level.FINE)) {
+				LOG.log(Level.FINE, errMsg, e);
+			} else {
+				 LOG.warning(errMsg);
+			}
+		}
+		
+		return new Configuration();
+	}
+	
+	private void writeConfig(Configuration config) {
+		File hostsFile = getHostsFile();
+		try {
+			//Host[] hostArray = (Host[]) hosts.toArray(new Host[hosts.size()]);
+			XMLEncoder encoder = new XMLEncoder(new FileOutputStream(hostsFile));
+			
+			encoder.writeObject(config);
+			encoder.close();
+			LOG.info("Hosts saved: " + hostsFile.getAbsolutePath());
+		} catch (FileNotFoundException e) {
+			String errMsg = "Could not save hosts: " + hostsFile.getAbsolutePath();
+			if (LOG.isLoggable(Level.FINE)) {
+				LOG.log(Level.FINE, errMsg, e);
+			} else {
+				LOG.warning(errMsg);
+			}
+		}
+	}
+	
+	private File getHostsFile() {
+		String home = System.getProperty("user.home");
+		
+		return new File(new File(home), ".wakeonlan.hosts");
+	}
+	
 	/**
 	 * The WakeOnLan main method.
 	 * 
@@ -204,6 +294,9 @@ public class WakeOnLan {
 
 /*
  * $Log: WakeOnLan.java,v $
+ * Revision 1.3  2004/04/14 11:13:08  gon23
+ * *** empty log message ***
+ *
  * Revision 1.2  2003/09/24 15:30:18  gon23
  * javadoc email spamblock
  *
