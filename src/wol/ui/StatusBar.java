@@ -1,5 +1,5 @@
 /*
- * $Id: StatusBar.java,v 1.1 2004/04/28 05:38:35 gon23 Exp $
+ * $Id: StatusBar.java,v 1.2 2004/05/18 13:55:52 gon23 Exp $
  */
 package wol.ui;
 
@@ -10,7 +10,9 @@ import javax.swing.JPanel;
 
 import wol.resources.Messages;
 
-
+/**
+ * @author <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#115;&#46;&#109;&#111;&#108;&#100;&#97;&#110;&#101;&#114;&#64;&#103;&#109;&#120;&#46;&#110;&#101;&#116;">Steffen Moldaner</a>
+ */
 public class StatusBar extends JPanel {
 
 	private javax.swing.JPanel statusPanel = null;
@@ -105,6 +107,9 @@ public class StatusBar extends JPanel {
 
 /*
  * $Log: StatusBar.java,v $
+ * Revision 1.2  2004/05/18 13:55:52  gon23
+ * *** empty log message ***
+ *
  * Revision 1.1  2004/04/28 05:38:35  gon23
  * Added Statusbar
  *

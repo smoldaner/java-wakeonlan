@@ -1,5 +1,5 @@
 /*
- * $Id: EditHostPanel.java,v 1.10 2004/05/17 21:58:59 gon23 Exp $
+ * $Id: EditHostPanel.java,v 1.11 2004/05/18 13:55:52 gon23 Exp $
  */
 package wol.ui;
 
@@ -252,9 +252,10 @@ public class EditHostPanel extends JPanel {
 	/**
 	 * Returns the currently used configuration. This does not update
 	 * the configuration. You need to update the configuration by calling 
-	 * @link #updateConfig() first! 
+	 * @link #applyChanges() first!
+	 *  
 	 * @return the currently used configuration
-	 * @see #updateConfig()
+	 * @see #applyChanges()
 	 */
 	public Machine getConfig() {
 		return config;
@@ -562,6 +563,9 @@ public class EditHostPanel extends JPanel {
 
 /*
  * $Log: EditHostPanel.java,v $
+ * Revision 1.11  2004/05/18 13:55:52  gon23
+ * *** empty log message ***
+ *
  * Revision 1.10  2004/05/17 21:58:59  gon23
  * javadoc
  *

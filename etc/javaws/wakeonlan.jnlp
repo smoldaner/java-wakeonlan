@@ -7,8 +7,16 @@
     <title>WakeOnLan</title>
     <vendor>Steffen Moldaner</vendor>
     <homepage href="../wakeonlan.html"/>
-    <description>A tool to wake up wake-on-lan (wol) enabled machiens.</description>
-    <description kind="short">A tool to wake up wake-on-lan (wol) enabled machiens.</description>
+    <description>
+    	wakeonlan is a small OS independent java program that sends 'magic packets' to 
+    	wake-on-lan enabled ethernet adapters and motherboards in order to switch on the called machine. 
+		wakeonlan can be used by commandline or by a graphical user interface. You can use wakeonlan as a java library too. 
+		It provides a util class to wake up remote machines.
+	</description>
+    <description kind="short">
+    	wakeonlan is a small OS independent java program that sends 'magic packets' to 
+    	wake-on-lan enabled ethernet adapters and motherboards in order to switch on the called machine.
+    </description>
     <offline-allowed/>
     <icon href="wakeonlan64x64.gif"/>
   </information>

@@ -1,5 +1,5 @@
 /*
- * $Id: Configuration.java,v 1.6 2004/04/28 05:39:02 gon23 Exp $
+ * $Id: Configuration.java,v 1.7 2004/05/18 13:55:53 gon23 Exp $
  */
 package wol.configuration;
 
@@ -123,7 +123,7 @@ public class Configuration {
 	 * @throws FileNotFoundException if the file exists but is a directory
     * 		  rather than a regular file, does not exist but cannot
     *         be created, or cannot be opened for any other reason
-	 * @see #saveConfigAs()
+	 * @see #saveConfigAs(File)
 	 */
 	public void saveConfigAs(File file) throws FileNotFoundException {
 		XMLEncoder encoder = new XMLEncoder(new FileOutputStream(file));
@@ -145,6 +145,9 @@ public class Configuration {
 
 /*
  * $Log: Configuration.java,v $
+ * Revision 1.7  2004/05/18 13:55:53  gon23
+ * *** empty log message ***
+ *
  * Revision 1.6  2004/04/28 05:39:02  gon23
  * Added default constructor
  *

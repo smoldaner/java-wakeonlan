@@ -1,17 +1,19 @@
 INTRODUCTION:
 
-This package sends 'magic packets' to wake-on-lan enabled ethernet adapters and motherboards 
-in order to switch on the called machine.
+wakeonlan is a small OS independent java program that sends 'magic packets'
+to wake-on-lan enabled ethernet adapters and motherboards in order to switch
+on the called machine.It runs on every machine with an installed 1.4 java runtime.
+wakeonlan can be used by commandline or by a graphical user interface. 
+You can use wakeonlan as a java library too. It provides a util class to wake up remote machines.
 
 SYSTEM REQUIREMENTS:
 
-any java 1.2 compatible runtime. If you are installing from source you'll need a java 1.2 compilant compiler.
+any java 1.4 compatible runtime. If you are installing from source you'll need a java 1.4 compilant compiler.
 Optionally you can use ant to build the sources.
 
 USED LIBRARIES:
 
-commons-cli (http://jakarta.apache.org/commons/cli/)
-commons-logging ((http://jakarta.apache.org/commons/logging/))
+- JSAP - Java Simple Argument Parser (http://www.martiansoftware.com/jsap/)
 
 BUILD:
 Change to the directory you unpacked the sources. 
@@ -28,31 +30,24 @@ to create the wakeonlan API.
 
 USAGE:
 
-Change to the directory where you unpacked wakeonlan. If you build the sources, change to the deploy directory.
-Type
+Change to the directory where you installed wakeonlan.
+Run on the command line
+
+java -jar wakeonlan.jar
+
+to start the graphical user interface. Run
 
 java -jar wakeonlan.jar --help
 
-or if that does not work
-
- java -classpath wakeonlan.jar:lib/commons-cli-1.0.jar wol.WakeOnLan --help
-
-for commandline help.
-
-EXAMPLES:
-
-This wakes up te machine with the hardware address 00:50:95:10:95:F5. Uses by deafult 255.255.255.255 as host and port 9:
-
-java -jar wakeonlan.jar 00:50:95:10:95:F5
-
-This wakes up te machine with the hardware address 00:50:95:10:95:F5 and uses the broadcast address 
-192.168.0.255 as host and the default port 9:
+to get the command line help.
 
 java -jar wakeonlan.jar -i 192.168.0.255 00:50:95:10:95:F5
 
-This wakes up te machines with the hardware addresses 00:50:95:10:95:F5 and 00:50:95:10:95:95.
+This will wake up the machine with hardware address 00:50:95:10:95:F5, in the local subnet.
 
-java -jar wakeonlan.jar -i yourhost.yourdomain.com 00:50:95:10:95:F5 00:50:95:10:95:95\n
+java -jar wakeonlan.jar machine1 machine2
+
+Wakes up machine1 and machine2 stored in the configuration.
 
 AUTHOR:
 

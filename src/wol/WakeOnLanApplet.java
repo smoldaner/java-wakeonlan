@@ -1,5 +1,5 @@
 /*
- * $Id: WakeOnLanApplet.java,v 1.4 2004/04/28 05:38:02 gon23 Exp $
+ * $Id: WakeOnLanApplet.java,v 1.5 2004/05/18 13:55:52 gon23 Exp $
  */
 package wol;
 
@@ -10,6 +10,9 @@ import javax.swing.JApplet;
 import wol.configuration.Configuration;
 import wol.ui.MainFrame;
 
+/**
+ * @author <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#115;&#46;&#109;&#111;&#108;&#100;&#97;&#110;&#101;&#114;&#64;&#103;&#109;&#120;&#46;&#110;&#101;&#116;">Steffen Moldaner</a>
+ */
 public class WakeOnLanApplet extends JApplet {
 	private MainFrame mainFrame;
 	
@@ -44,6 +47,9 @@ public class WakeOnLanApplet extends JApplet {
 
 /*
  * $Log: WakeOnLanApplet.java,v $
+ * Revision 1.5  2004/05/18 13:55:52  gon23
+ * *** empty log message ***
+ *
  * Revision 1.4  2004/04/28 05:38:02  gon23
  * Initial
  *

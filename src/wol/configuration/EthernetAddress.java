@@ -1,5 +1,5 @@
 /*
- * $Id: EthernetAddress.java,v 1.1 2004/04/27 19:08:15 gon23 Exp $
+ * $Id: EthernetAddress.java,v 1.2 2004/05/18 13:55:53 gon23 Exp $
  */
 package wol.configuration;
 
@@ -41,7 +41,7 @@ public class EthernetAddress implements Serializable, Cloneable{
 	 * Create a EthernetAddress based on the provided bytes. The byte array must have a length 
 	 * of 6 representing the 48 bit ethernet address.
 	 * 
-	 * @param bytes the bytes. Must have length of 6!
+	 * @param ethernetAddress the bytes. Must have length of 6!
 	 * @throws IllegalEthernetAddressException if ethernet address is of illegal length or null
 	 * @throws NullPointerException if the ethernet address is null
 	 */
@@ -161,6 +161,9 @@ public class EthernetAddress implements Serializable, Cloneable{
 
 /*
  * $Log: EthernetAddress.java,v $
+ * Revision 1.2  2004/05/18 13:55:53  gon23
+ * *** empty log message ***
+ *
  * Revision 1.1  2004/04/27 19:08:15  gon23
  * moved to wol.configuration
  *

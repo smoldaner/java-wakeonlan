@@ -1,20 +1,13 @@
 /*
- * $Id: WakeOnLan.java,v 1.11 2004/05/17 21:58:59 gon23 Exp $
+ * $Id: WakeOnLan.java,v 1.12 2004/05/18 13:55:52 gon23 Exp $
  */
 package wol;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.logging.Logger;
-
-import javax.swing.BorderFactory;
-import javax.swing.JFrame;
-import javax.swing.UIManager;
 
 import com.martiansoftware.jsap.FlaggedOption;
 import com.martiansoftware.jsap.JSAP;
@@ -31,7 +24,6 @@ import wol.configuration.Configuration;
 import wol.configuration.Machine;
 import wol.resources.Messages;
 import wol.ui.MainFrame;
-import wol.ui.MainPanel;
 
 /**
  * The only purpose of this class is to wake up a machine from the commandline
@@ -146,10 +138,6 @@ public class WakeOnLan {
 		return buffer.toString();
 	}
 	
-	private static File getConfigFile() {
-		return new File(getConfigFilePath());
-	}
-	
 	/**
 	 * The WakeOnLan main method.
 	 * 
@@ -262,6 +250,9 @@ public class WakeOnLan {
 
 /*
  * $Log: WakeOnLan.java,v $
+ * Revision 1.12  2004/05/18 13:55:52  gon23
+ * *** empty log message ***
+ *
  * Revision 1.11  2004/05/17 21:58:59  gon23
  * javadoc
  *
