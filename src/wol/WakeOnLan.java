@@ -1,32 +1,25 @@
 /*
- * $Id: WakeOnLan.java,v 1.3 2004/04/14 11:13:08 gon23 Exp $
+ * $Id: WakeOnLan.java,v 1.4 2004/04/14 18:21:40 gon23 Exp $
  */
 package wol;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
+import javax.swing.UIManager;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -37,7 +30,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
 import wol.configuration.Configuration;
-import wol.configuration.Host;
 import wol.ui.MainPanel;
 
 /**
@@ -132,15 +124,20 @@ public class WakeOnLan {
 	}
 
 	private void showGUI() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			LOG.info("Could not set system Look and Feel");
+		}
+		
 		JFrame frame = new JFrame("Wakeonlan");
-		final Configuration config  = readConfig();
+		Configuration config = new Configuration(getConfigFile());
 		final MainPanel mainPanel = new MainPanel(config);
 		
 		mainPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 		frame.setContentPane(mainPanel);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				writeConfig(config);
 				System.exit(0);
 			}
 		});
@@ -148,52 +145,7 @@ public class WakeOnLan {
 		frame.show();
 	}
 	
-	private Configuration readConfig() {
-		File hostsFile = getHostsFile();
-		
-		try {
-			if (hostsFile.exists()) {
-				FileInputStream fis = new FileInputStream(hostsFile);
-				XMLDecoder decoder = new XMLDecoder(fis);
-			
-				Configuration config = (Configuration) decoder.readObject();
-				LOG.info("using hosts-file: " + hostsFile.getAbsolutePath());
-				
-				return config;
-			}
-		} catch (FileNotFoundException e) {
-			String errMsg = "Could not read hosts-file: " + hostsFile.getAbsolutePath();
-			
-			if (LOG.isLoggable(Level.FINE)) {
-				LOG.log(Level.FINE, errMsg, e);
-			} else {
-				 LOG.warning(errMsg);
-			}
-		}
-		
-		return new Configuration();
-	}
-	
-	private void writeConfig(Configuration config) {
-		File hostsFile = getHostsFile();
-		try {
-			//Host[] hostArray = (Host[]) hosts.toArray(new Host[hosts.size()]);
-			XMLEncoder encoder = new XMLEncoder(new FileOutputStream(hostsFile));
-			
-			encoder.writeObject(config);
-			encoder.close();
-			LOG.info("Hosts saved: " + hostsFile.getAbsolutePath());
-		} catch (FileNotFoundException e) {
-			String errMsg = "Could not save hosts: " + hostsFile.getAbsolutePath();
-			if (LOG.isLoggable(Level.FINE)) {
-				LOG.log(Level.FINE, errMsg, e);
-			} else {
-				LOG.warning(errMsg);
-			}
-		}
-	}
-	
-	private File getHostsFile() {
+	private File getConfigFile() {
 		String home = System.getProperty("user.home");
 		
 		return new File(new File(home), ".wakeonlan.hosts");
@@ -294,6 +246,9 @@ public class WakeOnLan {
 
 /*
  * $Log: WakeOnLan.java,v $
+ * Revision 1.4  2004/04/14 18:21:40  gon23
+ * *** empty log message ***
+ *
  * Revision 1.3  2004/04/14 11:13:08  gon23
  * *** empty log message ***
  *

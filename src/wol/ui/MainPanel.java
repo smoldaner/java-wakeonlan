@@ -1,35 +1,42 @@
 /*
- * $Id: MainPanel.java,v 1.3 2004/04/14 11:13:39 gon23 Exp $
+ * $Id: MainPanel.java,v 1.4 2004/04/14 18:21:40 gon23 Exp $
  */
 package wol.ui;
 
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.NumberFormat;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
-import javax.swing.JFormattedTextField;
+import javax.swing.JFileChooser;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ListDataListener;
-import javax.swing.text.NumberFormatter;
 
+import wol.Errors;
 import wol.configuration.*;
 
 
 public class MainPanel extends JPanel {
+	private final static Logger LOG = Logger.getLogger(MainPanel.class.getName());
 	private EditHostPanel editHostPanel;
 	private javax.swing.JPanel buttonPanel = null;
 	private javax.swing.JButton wakeupButton = null;
@@ -41,10 +48,19 @@ public class MainPanel extends JPanel {
 	private javax.swing.JLabel configurationsLabel = null;
 	private javax.swing.JButton newButton = null;
 	private javax.swing.JButton deleteButton = null;
-	private javax.swing.JPanel modifyPanel = null;
 	private javax.swing.JPanel wakeupPanel = null;
 	private HostsModel configurationsModel;
 	private Configuration config;
+	private JMenuBar menuBar;
+	private JMenu fileMenu;
+	private JMenuItem newConfigMenuItem;
+	private JMenu newMenu;
+	private JMenuItem newHostMenuItem;
+	private JMenuItem saveMenuItem;
+	private JMenuItem saveAsMenuItem;
+	private JMenuItem openMenuItem;
+	private JMenuItem exitMenuItem;
+	private JPanel configurationsButtonPanel;
 
 	public MainPanel() {
 		super();
@@ -65,19 +81,164 @@ public class MainPanel extends JPanel {
 
 	private void initialize() {
 		this.setLayout(new java.awt.BorderLayout());
+		this.add(getMenuBar(), BorderLayout.NORTH);
 		this.add(getButtonPanel(), java.awt.BorderLayout.SOUTH);
 		this.add(getCenterPanel(), java.awt.BorderLayout.CENTER);
 	}
 	
-	private Host getCurrentConfig() {
-		return (Host) getConfigurationsList().getSelectedValue();
+	private JMenuBar getMenuBar() {
+		if (null == menuBar) {
+			menuBar = new JMenuBar();
+			menuBar.add(getFileMenu());
+		}
+		
+		return menuBar;
+	}
+	
+	private JMenu getFileMenu() {
+		if (null == fileMenu) {
+			fileMenu = new JMenu(Messages.getString("menu.file.label"));
+			fileMenu.setMnemonic(Messages.getMnemonic("menu.file.mnemonic"));
+			fileMenu.add(getNewMenu());
+			fileMenu.addSeparator();
+			fileMenu.add(getOpenMenuItem());
+			fileMenu.addSeparator();
+			fileMenu.add(getSaveMenuItem());
+			fileMenu.add(getSaveAsMenuItem());
+			fileMenu.addSeparator();
+			fileMenu.add(getExitMenuItem());
+		}
+		
+		return fileMenu;
+	}
+	
+	private JMenuItem getOpenMenuItem() {
+		if (null == openMenuItem) {
+			openMenuItem = new JMenuItem(Messages.getString("menu.file.open.label"));
+			openMenuItem.setMnemonic(Messages.getMnemonic("menu.file.open.mnemonic"));
+		}
+		
+		return openMenuItem;
+	}
+	
+	private JMenuItem getSaveMenuItem() {
+		if (null == saveMenuItem) {
+			saveMenuItem = new JMenuItem(Messages.getString("menu.file.save.label"));
+			saveMenuItem.setMnemonic(Messages.getMnemonic("menu.file.save.mnemonic"));
+			saveMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							getEditHostPanel().applyChanges();
+
+							try {
+								saveConfig();
+							} catch (FileNotFoundException e1) {
+								LOG.log(Level.SEVERE, "Can't write config", e1);
+								JOptionPane.showMessageDialog(MainPanel.this, Errors.getString("save.fileNotFound.message"), Errors.getString("save.fileNotFound.title"), JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					});
+					
+				}
+			});
+		}
+		
+		return saveMenuItem;
+	}
+	
+	public void updateConfig() {
+		config.setHosts(configurationsModel.getHosts());
+	}
+	
+	private void saveConfig(File file) throws FileNotFoundException {
+		updateConfig();
+		config.saveConfig(file);
+	}
+	
+	private void saveConfig() throws FileNotFoundException {
+		updateConfig();
+		config.saveConfig();
+	}
+	
+	private JMenuItem getSaveAsMenuItem() {
+		if (null == saveAsMenuItem) {
+			saveAsMenuItem = new JMenuItem(Messages.getString("menu.file.saveAs.label"));
+			saveAsMenuItem.setMnemonic(Messages.getMnemonic("menu.file.saveAs.mnemonic"));
+			saveAsMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					JFileChooser fileChooser = new JFileChooser(config.getFile());
+					
+					fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+					
+					if (fileChooser.showOpenDialog(MainPanel.this) == JFileChooser.APPROVE_OPTION) {
+						try {
+							saveConfig(fileChooser.getSelectedFile());
+						} catch (FileNotFoundException e1) {
+							LOG.log(Level.SEVERE, "Can't write config", e1);
+							JOptionPane
+									.showMessageDialog(
+											MainPanel.this,
+											Errors.getString("save.fileNotFound.message"),
+											Errors.getString("save.fileNotFound.title"),
+											JOptionPane.ERROR_MESSAGE);
+						}
+						
+					}
+				}
+			});
+		}
+		
+		return saveAsMenuItem;
+	}
+	
+	private JMenu getNewMenu() {
+		if (null == newMenu) {
+			newMenu = new JMenu(Messages.getString("menu.file.new.label"));
+			newMenu.setMnemonic(Messages.getMnemonic("menu.file.new.mnemonic"));
+			newMenu.add(getNewConfigMenuItem());
+			newMenu.add(getNewHostMenuItem());
+			
+		}
+		
+		return newMenu;
+	}
+	
+	private JMenuItem getNewConfigMenuItem() {
+		if (null == newConfigMenuItem) {
+			newConfigMenuItem = new JMenuItem(Messages.getString("menu.file.new.config.label"));
+			newConfigMenuItem.setMnemonic(Messages.getMnemonic("menu.file.new.config.mnemonic"));
+		}
+		
+		return newConfigMenuItem;
+	}
+	
+	private JMenuItem getNewHostMenuItem() {
+		if (null == newHostMenuItem) {
+			newHostMenuItem = new JMenuItem(Messages.getString("menu.file.new.host.label"));
+			newHostMenuItem.setMnemonic(Messages.getMnemonic("menu.file.new.host.mnemonic"));
+		}
+		
+		return newHostMenuItem;
+	}
+	
+	private JMenuItem getExitMenuItem() {
+		if (null == exitMenuItem) {
+			exitMenuItem = new JMenuItem(Messages.getString("menu.file.exit.label"));
+			exitMenuItem.setMnemonic(Messages.getMnemonic("menu.file.exit.mnemonic"));
+		}
+		
+		return exitMenuItem;
 	}
 
 	private javax.swing.JPanel getButtonPanel() {
 		if(buttonPanel == null) {
 			buttonPanel = new javax.swing.JPanel();
+			buttonPanel.setBorder(BorderFactory.createCompoundBorder(
+					BorderFactory.createEmptyBorder(15, 0, 0, 0), BorderFactory
+							.createMatteBorder(1, 0, 0, 0, getBackground()
+									.brighter())));
 			buttonPanel.setLayout(new java.awt.BorderLayout());
-			buttonPanel.add(getModifyPanel(), java.awt.BorderLayout.WEST);
 			buttonPanel.add(getWakeupPanel(), java.awt.BorderLayout.EAST);
 		}
 		return buttonPanel;
@@ -88,7 +249,8 @@ public class MainPanel extends JPanel {
 			wakeupButton = new javax.swing.JButton();
 			wakeupButton.setText(Messages.getString("button.wakeup")); //$NON-NLS-1$
 			wakeupButton.addActionListener(new java.awt.event.ActionListener() { 
-				public void actionPerformed(java.awt.event.ActionEvent e) {    
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					getEditHostPanel().applyChanges();
 					System.out.println("actionPerformed()"); // TODO Auto-generated Event stub actionPerformed()
 				}
 			});
@@ -99,9 +261,26 @@ public class MainPanel extends JPanel {
 	private javax.swing.JPanel getCenterPanel() {
 		if(centerPanel == null) {
 			centerPanel = new javax.swing.JPanel();
-			centerPanel.setLayout(new java.awt.BorderLayout());
-			centerPanel.add(getEditHostPanel(), java.awt.BorderLayout.EAST);
-			centerPanel.add(getConfigurationsPanel(), java.awt.BorderLayout.CENTER);
+			centerPanel.setLayout(new GridBagLayout());
+			GridBagConstraints editHostConstraints = new GridBagConstraints();
+			GridBagConstraints configurationsConstraints = new GridBagConstraints();
+			Insets insets = new Insets(2, 2, 2, 2);
+			editHostConstraints.gridx = 1;
+			editHostConstraints.gridy = 0;
+			editHostConstraints.weightx = 0.3D;
+			editHostConstraints.weighty = 1.0D;
+			editHostConstraints.fill = GridBagConstraints.BOTH;
+			editHostConstraints.insets = insets;
+			
+			configurationsConstraints.gridx = 0;
+			configurationsConstraints.gridy = 0;
+			configurationsConstraints.weightx = 0.7D;
+			configurationsConstraints.weighty = 1.0D;
+			configurationsConstraints.fill = GridBagConstraints.BOTH;
+			configurationsConstraints.insets = insets;
+			
+			centerPanel.add(getEditHostPanel(), editHostConstraints);
+			centerPanel.add(getConfigurationsPanel(), configurationsConstraints);
 		}
 		return centerPanel;
 	}
@@ -134,8 +313,8 @@ public class MainPanel extends JPanel {
 						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {
 								getDeleteButton().setEnabled(!configurationsList.isSelectionEmpty());
+								getWakeupButton().setEnabled(!configurationsList.isSelectionEmpty());
 								
-								Host oldConfig = getEditHostPanel().updateConfig();
 								Host newConfig = null;
 								Object[] selectedHosts = configurationsList.getSelectedValues();
 								
@@ -162,14 +341,26 @@ public class MainPanel extends JPanel {
 			configurationsPanel.setLayout(new java.awt.BorderLayout());
 			configurationsPanel.add(getConfigurationsScrollPane(), java.awt.BorderLayout.CENTER);
 			configurationsPanel.add(getConfigurationsLabel(), java.awt.BorderLayout.NORTH);
+			configurationsPanel.add(getConfigurationsButtonPanel(), BorderLayout.SOUTH);
 		}
 		return configurationsPanel;
+	}
+	
+	private JPanel getConfigurationsButtonPanel() {
+		if (null == configurationsButtonPanel) {
+			configurationsButtonPanel = new JPanel();
+			configurationsButtonPanel.add(getNewButton());
+			configurationsButtonPanel.add(getDeleteButton());
+		}
+		
+		return configurationsButtonPanel;
 	}
 
 	private javax.swing.JLabel getConfigurationsLabel() {
 		if(configurationsLabel == null) {
 			configurationsLabel = new javax.swing.JLabel();
 			configurationsLabel.setText(Messages.getString("configurations.label")); //$NON-NLS-1$
+			configurationsLabel.setLabelFor(getConfigurationsList());
 		}
 		return configurationsLabel;
 	}
@@ -205,16 +396,6 @@ public class MainPanel extends JPanel {
 			});
 		}
 		return deleteButton;
-	}
-
-
-	private javax.swing.JPanel getModifyPanel() {
-		if(modifyPanel == null) {
-			modifyPanel = new javax.swing.JPanel();
-			modifyPanel.add(getNewButton(), null);
-			modifyPanel.add(getDeleteButton(), null);
-		}
-		return modifyPanel;
 	}
 
 	private javax.swing.JPanel getWakeupPanel() {
@@ -258,15 +439,23 @@ public class MainPanel extends JPanel {
 		}
 
 		public Object getElementAt(int index) {
-			return hosts.get(index);
+			synchronized(hosts) {
+				return hosts.get(index);
+			}
 		}
 		
 		public int getSize() {
-			return hosts.size();
+			synchronized(hosts) {
+				return hosts.size();
+			}
 		}
 		
 		public Host deleteHost(int index) {
-			Host oldHost = (Host) hosts.remove(index);
+			Host oldHost;
+			
+			synchronized(hosts) {
+				oldHost = (Host) hosts.remove(index);
+			}
 			
 			oldHost.removePropertyChangeListener(this);
 			fireIntervalRemoved(this, index, index);
@@ -278,18 +467,12 @@ public class MainPanel extends JPanel {
 			Host newHost = new Host(getNewName(Messages.getString("defaultConfigurationName")));
 			
 			newHost.addPropertyChangeListener(this);
-			
-			for (int i = 0; i < hosts.size(); i++) {
-				Host host = (Host) hosts.get(i);
+			int index;
 				
-				if (hostComparator.compare(newHost, host) < 0) {
-					
-				}
-			}			
-			hosts.add(newHost);
-			
-			
-			int index = hosts.indexOf(newHost);
+			synchronized(hosts) {
+				hosts.add(newHost);
+				index = hosts.size()-1;
+			}
 			
 			fireIntervalAdded(this, index, index);
 			
@@ -326,13 +509,14 @@ public class MainPanel extends JPanel {
 			int index = hosts.indexOf(event.getSource());
 			
 			if (-1 != index && "name".equals(event.getPropertyName())) {
-				Collections.sort(hosts, hostComparator);
 				fireContentsChanged(this, 0, hosts.size()-1);
 			}
 		}
 		
-		public List getHosts() {
-			return hosts;
+		public Host[] getHosts() {
+			Host[] retHosts = new Host[hosts.size()];
+			
+			return (Host[]) hosts.toArray(retHosts);
 		}
 
 	}
@@ -342,6 +526,9 @@ public class MainPanel extends JPanel {
 
 /*
  * $Log: MainPanel.java,v $
+ * Revision 1.4  2004/04/14 18:21:40  gon23
+ * *** empty log message ***
+ *
  * Revision 1.3  2004/04/14 11:13:39  gon23
  * *** empty log message ***
  *

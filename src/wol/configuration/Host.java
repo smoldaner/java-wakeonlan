@@ -1,5 +1,5 @@
 /*
- * $Id: Host.java,v 1.1 2004/04/14 11:13:08 gon23 Exp $
+ * $Id: Host.java,v 1.2 2004/04/14 18:21:39 gon23 Exp $
  */
 package wol.configuration;
 
@@ -8,11 +8,11 @@ import java.beans.PropertyChangeSupport;
 
 
 public class Host {
-	private String comment;
-	private String name;
-	private String host;
-	private String hwAdress;
-	private int port;
+	private String comment = "";
+	private String name = "";
+	private String host = "255.255.255.255";
+	private String hwAdress ="";
+	private int port = 9;
 	private PropertyChangeSupport pcs;
 	
 	public Host() {
@@ -100,10 +100,75 @@ public class Host {
 		pcs.removePropertyChangeListener(propertyName, listener);
 	}
 
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		
+		if (null == obj) {
+			return false;
+		}
+		
+		
+		if (obj.getClass() != this.getClass()) {
+			return false;
+		}
+		
+		Host other = (Host) obj;
+		
+		if (null != this.name) {
+			if (!this.name.equals(other.name)) {
+				return false;
+			}
+		} else {
+			if (null != other.name) {
+				return false;
+			}
+		}
+		
+		if (null != this.host) {
+			if (!this.host.equals(other.host)) {
+				return false;
+			}
+		} else {
+			if (null != other.host) {
+				return false;
+			}
+		}
+		
+		if (null != this.hwAdress) {
+			if (!this.hwAdress.equals(other.hwAdress)) {
+				return false;
+			}
+		} else {
+			if (null != other.hwAdress) {
+				return false;
+			}
+		}
+		
+		if (null != this.comment) {
+			if (!this.comment.equals(other.comment)) {
+				return false;
+			}
+		} else {
+			if (null != other.comment) {
+				return false;
+			}
+		}
+		
+		if (this.port != other.port) {
+			return false;
+		}
+		
+		return true;
+	}
 }
 
 /*
  * $Log: Host.java,v $
+ * Revision 1.2  2004/04/14 18:21:39  gon23
+ * *** empty log message ***
+ *
  * Revision 1.1  2004/04/14 11:13:08  gon23
  * *** empty log message ***
  *

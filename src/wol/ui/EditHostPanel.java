@@ -1,21 +1,25 @@
 /*
- * $Id: EditHostPanel.java,v 1.1 2004/04/14 11:13:37 gon23 Exp $
+ * $Id: EditHostPanel.java,v 1.2 2004/04/14 18:21:40 gon23 Exp $
  */
 package wol.ui;
 
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.NumberFormat;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 import javax.swing.InputVerifier;
+import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.text.NumberFormatter;
+import javax.swing.SwingUtilities;
 
+import wol.Errors;
 import wol.configuration.*;
 
 public class EditHostPanel extends JPanel {
@@ -31,6 +35,10 @@ public class EditHostPanel extends JPanel {
 	private javax.swing.JScrollPane commentScrollPane = null;
 	private javax.swing.JTextArea commentTextArea = null;
 	private Host config;
+	private JPanel editPanel;
+	private JPanel buttonPanel;
+	private JButton applyButton;
+	private JButton revertButton;
 
 	public EditHostPanel() {
 		super();
@@ -42,74 +50,160 @@ public class EditHostPanel extends JPanel {
 		initialize();
 		setConfig(config);
 	}
-
+	
 	private void initialize() {
-		java.awt.GridBagConstraints consGridBagConstraints2 = new java.awt.GridBagConstraints();
-		java.awt.GridBagConstraints consGridBagConstraints1 = new java.awt.GridBagConstraints();
-		java.awt.GridBagConstraints consGridBagConstraints3 = new java.awt.GridBagConstraints();
-		java.awt.GridBagConstraints consGridBagConstraints4 = new java.awt.GridBagConstraints();
-		java.awt.GridBagConstraints consGridBagConstraints5 = new java.awt.GridBagConstraints();
-		java.awt.GridBagConstraints consGridBagConstraints7 = new java.awt.GridBagConstraints();
-		java.awt.GridBagConstraints consGridBagConstraints6 = new java.awt.GridBagConstraints();
-		java.awt.GridBagConstraints consGridBagConstraints21 = new java.awt.GridBagConstraints();
-		java.awt.GridBagConstraints consGridBagConstraints31 = new java.awt.GridBagConstraints();
-		java.awt.GridBagConstraints consGridBagConstraints8 = new java.awt.GridBagConstraints();
-		consGridBagConstraints21.gridy = 3;
-		consGridBagConstraints21.gridx = 0;
-		consGridBagConstraints21.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		consGridBagConstraints21.weighty = 1.0D;
-		consGridBagConstraints31.weightx = 1.0;
-		consGridBagConstraints31.weighty = 1.0;
-		consGridBagConstraints31.fill = java.awt.GridBagConstraints.BOTH;
-		consGridBagConstraints31.gridy = 3;
-		consGridBagConstraints31.gridx = 1;
-		consGridBagConstraints31.gridwidth = 3;
-		consGridBagConstraints3.weightx = 1.0;
-		consGridBagConstraints3.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		consGridBagConstraints3.gridx = 1;
-		consGridBagConstraints3.gridy = 1;
-		consGridBagConstraints4.weightx = 0.0D;
-		consGridBagConstraints4.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		consGridBagConstraints4.gridx = 3;
-		consGridBagConstraints4.gridy = 1;
-		consGridBagConstraints5.weightx = 1.0;
-		consGridBagConstraints5.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		consGridBagConstraints7.gridx = 2;
-		consGridBagConstraints7.gridy = 1;
-		consGridBagConstraints1.weightx = 1.0;
-		consGridBagConstraints1.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		consGridBagConstraints1.gridx = 1;
-		consGridBagConstraints2.gridx = 0;
-		consGridBagConstraints2.gridy = 0;
-		consGridBagConstraints1.gridy = 0;
-		consGridBagConstraints1.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		consGridBagConstraints1.gridwidth = 3;
-		consGridBagConstraints6.gridx = 0;
-		consGridBagConstraints6.gridy = 1;
-		consGridBagConstraints8.gridx = 0;
-		consGridBagConstraints8.gridy = 2;
-		consGridBagConstraints5.gridx = 1;
-		consGridBagConstraints5.gridy = 2;
-		consGridBagConstraints5.gridwidth = 3;
-		consGridBagConstraints5.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		consGridBagConstraints2.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		consGridBagConstraints6.anchor = java.awt.GridBagConstraints.SOUTHWEST;
-		consGridBagConstraints8.anchor = java.awt.GridBagConstraints.WEST;
-		consGridBagConstraints7.anchor = java.awt.GridBagConstraints.WEST;
-		consGridBagConstraints4.anchor = java.awt.GridBagConstraints.SOUTHWEST;
-		consGridBagConstraints2.weighty = 0.5D;
-		consGridBagConstraints3.anchor = java.awt.GridBagConstraints.SOUTHWEST;
-		setLayout(new java.awt.GridBagLayout());
-		add(getNameLabel(), consGridBagConstraints2);
-		add(getNameTextField(), consGridBagConstraints1);
-		add(getHostLabel(), consGridBagConstraints6);
-		add(getHostTextField(), consGridBagConstraints3);
-		add(getPortLabel(), consGridBagConstraints7);
-		add(getPortTextField(), consGridBagConstraints4);
-		add(getHwAdressLabel(), consGridBagConstraints8);
-		add(getHwAdressTextField(), consGridBagConstraints5);
-		add(getCommentLabel(), consGridBagConstraints21);
-		add(getCommentScrollPane(), consGridBagConstraints31);
+		setLayout(new BorderLayout());
+		add(getEditPanel(), BorderLayout.CENTER);
+		add(getButtonPanel(), BorderLayout.SOUTH);
+	}
+
+	private JPanel getButtonPanel() {
+		if (null == buttonPanel) {
+			buttonPanel = new JPanel();
+			//buttonPanel.setLayout(new BorderLayout());
+			buttonPanel.add(getApplyButton(), null);
+			buttonPanel.add(getRevertButton(), null);
+		}
+		
+		return buttonPanel;
+	}
+
+	private JButton getRevertButton() {
+		if (null == revertButton) {
+			revertButton = new JButton();
+			revertButton.setText(Messages.getString("button.revert"));
+			revertButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							updateFromConfig();
+						}
+					});
+				}
+			});
+			revertButton.setEnabled(false);
+		}
+		return revertButton;
+	}
+
+	private JButton getApplyButton() {
+		if (null == applyButton) {
+			applyButton = new JButton();
+			applyButton.setText(Messages.getString("button.apply"));
+			applyButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							applyChanges();
+						}
+					});
+				}
+			});
+			applyButton.setEnabled(false);		
+		}
+		
+		return applyButton;
+	}
+
+	private JPanel getEditPanel() {
+		if (null == editPanel) {
+			editPanel = new JPanel();
+		
+			java.awt.GridBagConstraints nameLabelConstraints = new java.awt.GridBagConstraints();
+			java.awt.GridBagConstraints nameTextFieldConstraints = new java.awt.GridBagConstraints();
+			java.awt.GridBagConstraints hostTextFieldConstraints = new java.awt.GridBagConstraints();
+			java.awt.GridBagConstraints portTextFieldConstraints = new java.awt.GridBagConstraints();
+			java.awt.GridBagConstraints hwAdressTextFieldConstraints = new java.awt.GridBagConstraints();
+			java.awt.GridBagConstraints portLabelConstraints = new java.awt.GridBagConstraints();
+			java.awt.GridBagConstraints hostLabelConstraints = new java.awt.GridBagConstraints();
+			java.awt.GridBagConstraints commentLabelConstraints = new java.awt.GridBagConstraints();
+			java.awt.GridBagConstraints commentTextFieldConstraints = new java.awt.GridBagConstraints();
+			java.awt.GridBagConstraints hwAdressLabelConstraints = new java.awt.GridBagConstraints();
+			Insets insets = new Insets(1, 2, 1, 2);
+			
+			nameLabelConstraints.gridx = 0;
+			nameLabelConstraints.gridy = 0;
+			nameLabelConstraints.anchor = java.awt.GridBagConstraints.WEST;
+			nameLabelConstraints.insets = new Insets(0, 2, 0, 2);
+		
+			nameTextFieldConstraints.gridx = 1;
+			nameTextFieldConstraints.gridy = 0;
+			nameTextFieldConstraints.weightx = 1.0;
+			nameTextFieldConstraints.gridwidth = GridBagConstraints.REMAINDER;
+			nameTextFieldConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+			nameTextFieldConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			nameTextFieldConstraints.insets = new Insets(0, 2, 0, 2);
+			
+			hwAdressLabelConstraints.gridx = 0;
+			hwAdressLabelConstraints.gridy = 1;
+			hwAdressLabelConstraints.gridwidth = GridBagConstraints.REMAINDER;
+			hwAdressLabelConstraints.weighty = 0.4D;
+			hwAdressLabelConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
+			hwAdressLabelConstraints.insets = insets;
+			
+			hwAdressTextFieldConstraints.weightx = 1.0;
+			hwAdressTextFieldConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+			hwAdressTextFieldConstraints.gridx = 0;
+			hwAdressTextFieldConstraints.gridy = 2;
+			hwAdressTextFieldConstraints.gridwidth = GridBagConstraints.REMAINDER;
+			hwAdressTextFieldConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			hwAdressTextFieldConstraints.insets = insets;
+			
+			hostLabelConstraints.gridx = 0;
+			hostLabelConstraints.gridy = 3;
+			hostLabelConstraints.gridwidth = 2;
+			hostLabelConstraints.anchor = java.awt.GridBagConstraints.WEST;
+			hostLabelConstraints.insets = insets;
+			
+			portLabelConstraints.gridx = 2;
+			portLabelConstraints.gridy = 3;
+			portLabelConstraints.gridwidth = GridBagConstraints.REMAINDER;
+			portLabelConstraints.anchor = java.awt.GridBagConstraints.WEST;
+			portLabelConstraints.insets = insets;
+			
+			hostTextFieldConstraints.weightx = 1.0;
+			hostTextFieldConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+			hostTextFieldConstraints.gridx = 0;
+			hostTextFieldConstraints.gridy = 4;
+			hostTextFieldConstraints.gridwidth = 2;
+			hostTextFieldConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			hostTextFieldConstraints.insets = insets;
+			
+			portTextFieldConstraints.weightx = 0.0D;
+			portTextFieldConstraints.gridx = 3;
+			portTextFieldConstraints.gridy = 4;
+			portTextFieldConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+			portTextFieldConstraints.insets = insets;
+			
+			commentLabelConstraints.gridx = 0;
+			commentLabelConstraints.gridy = 5;
+			commentLabelConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			commentLabelConstraints.gridwidth = GridBagConstraints.REMAINDER;
+			commentLabelConstraints.insets = insets;
+			
+			commentTextFieldConstraints.weightx = 1.0D;
+			commentTextFieldConstraints.weighty = 1.0D;
+			commentTextFieldConstraints.fill = java.awt.GridBagConstraints.BOTH;
+			commentTextFieldConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			commentTextFieldConstraints.gridy = 6;
+			commentTextFieldConstraints.gridx = 0;
+			commentTextFieldConstraints.gridwidth = GridBagConstraints.REMAINDER;
+			commentTextFieldConstraints.insets = new Insets(0, 2, 0, 2);
+			
+			editPanel.setLayout(new java.awt.GridBagLayout());
+			editPanel.add(getNameLabel(), nameLabelConstraints);
+			editPanel.add(getNameTextField(), nameTextFieldConstraints);
+			editPanel.add(getHostLabel(), hostLabelConstraints);
+			editPanel.add(getHostTextField(), hostTextFieldConstraints);
+			editPanel.add(getPortLabel(), portLabelConstraints);
+			editPanel.add(getPortTextField(), portTextFieldConstraints);
+			editPanel.add(getHwAdressLabel(), hwAdressLabelConstraints);
+			editPanel.add(getHwAdressTextField(), hwAdressTextFieldConstraints);
+			editPanel.add(getCommentLabel(), commentLabelConstraints);
+			editPanel.add(getCommentScrollPane(), commentTextFieldConstraints);
+		}
+		
+		return editPanel;
 	}
 
 	private javax.swing.JLabel getNameLabel() {
@@ -126,13 +220,17 @@ public class EditHostPanel extends JPanel {
 			nameTextField = new javax.swing.JTextField();
 			nameTextField.setToolTipText(Messages.getString("name.tooltip"));
 			nameTextField.setColumns(20);
-			nameTextField.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					getConfig().setName(nameTextField.getText());
-				}
-
-			});
 			nameTextField.setEnabled(false);
+			nameTextField.addKeyListener(new KeyAdapter() {
+				public void keyTyped(KeyEvent e) {
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							checkButtonStates();
+						}
+					});
+					
+				}
+			});
 		}
 
 		return nameTextField;
@@ -144,23 +242,9 @@ public class EditHostPanel extends JPanel {
 	 * @link #updateConfig() first! 
 	 * @return the currently used configuration
 	 * @see #updateConfig()
-	 * @see #getConfig(boolean)
 	 */
 	public Host getConfig() {
 		return config;
-	}
-	/**
-	 * 
-	 * @param update if <code>true</code> the current configuration will be updated
-	 * 					before it is returned. 
-	 * @return the current configuration after a call to @link #updateConfig()
-	 * @see #updateConfig()
-	 * @see #getConfig(boolean)
-	 */
-	public synchronized Host getConfig(boolean update) {
-		updateConfig();
-		
-		return getConfig();
 	}
 	
 	/**
@@ -169,6 +253,12 @@ public class EditHostPanel extends JPanel {
 	 * @param config the configuration
 	 */	
 	public synchronized void setConfig(Host config) {
+		if (hasChanges()) {
+			if (JOptionPane.showConfirmDialog(this, Errors.getFormattedString("host.unsavedChanges.message", config.getName()), Errors.getString("host.unsavedChanges.title"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+				applyChanges();
+			}
+		}
+		
 		this.config = config;
 		updateFromConfig();
 	}
@@ -179,7 +269,7 @@ public class EditHostPanel extends JPanel {
 	 * 
 	 * @return the updated configuration. Null if there is no current configuration.
 	 */
-	public synchronized Host updateConfig() {
+	public synchronized Host applyChanges() {
 		if (null != config) {
 			int port = -1;
 			
@@ -193,8 +283,9 @@ public class EditHostPanel extends JPanel {
 			config.setHwAdress(getHwAdressTextField().getText());
 			config.setName(getNameTextField().getText());
 			config.setComment(getCommentTextArea().getText());
-		}
-		
+			
+			checkButtonStates();
+		}		
 		
 		return config;
 	}
@@ -212,9 +303,14 @@ public class EditHostPanel extends JPanel {
 		if (hostTextField == null) {
 			hostTextField = new javax.swing.JTextField();
 			hostTextField.setToolTipText(Messages.getString("host.tooltip"));
-			hostTextField.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					getConfig().setHost(hostTextField.getText());
+			hostTextField.addKeyListener(new KeyAdapter() {
+				public void keyTyped(KeyEvent e) {
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							checkButtonStates();
+						}
+					});
+					
 				}
 			});
 			hostTextField.setEnabled(false);
@@ -236,6 +332,7 @@ public class EditHostPanel extends JPanel {
 		if (portTextField == null) {
 			portTextField = new JTextField();
 			portTextField.setColumns(4);
+			portTextField.setHorizontalAlignment(JTextField.RIGHT);
 			portTextField.setToolTipText(Messages.getString("port.tooltip"));
 			portTextField.setInputVerifier(new InputVerifier() {
 				public boolean verify(JComponent input) {
@@ -253,6 +350,15 @@ public class EditHostPanel extends JPanel {
 					}
 					
 					return port > 0;
+				}
+			});
+			portTextField.addKeyListener(new KeyAdapter() {
+				public void keyTyped(KeyEvent e) {
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							checkButtonStates();
+						}
+					});
 				}
 			});
 			portTextField.setEnabled(false);
@@ -274,9 +380,14 @@ public class EditHostPanel extends JPanel {
 		if (hwAdressTextField == null) {
 			hwAdressTextField = new javax.swing.JTextField();
 			hwAdressTextField.setToolTipText(Messages.getString("hwAdress.tooltip"));
-			hwAdressTextField.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					getConfig().setHwAdress(hwAdressTextField.getText());
+			hwAdressTextField.addKeyListener(new KeyAdapter() {
+				public void keyTyped(KeyEvent e) {
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							checkButtonStates();
+						}
+					});
+					
 				}
 			});
 			hwAdressTextField.setEnabled(false);
@@ -308,6 +419,8 @@ public class EditHostPanel extends JPanel {
 		getPortTextField().setEnabled(enabled);
 		getHwAdressTextField().setEnabled(enabled);
 		getCommentTextArea().setEnabled(enabled);
+		
+		checkButtonStates();
 	}
 
 	private javax.swing.JLabel getCommentLabel() {
@@ -322,7 +435,6 @@ public class EditHostPanel extends JPanel {
 	private javax.swing.JScrollPane getCommentScrollPane() {
 		if (commentScrollPane == null) {
 			commentScrollPane = new javax.swing.JScrollPane();
-			//commentScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 			commentScrollPane.setViewportView(getCommentTextArea());
 		}
 		return commentScrollPane;
@@ -331,17 +443,74 @@ public class EditHostPanel extends JPanel {
 	private javax.swing.JTextArea getCommentTextArea() {
 		if (commentTextArea == null) {
 			commentTextArea = new javax.swing.JTextArea();
+			commentTextArea.setRows(15);
 			commentTextArea.setToolTipText(Messages.getString("comment.tooltip"));
+			commentTextArea.addKeyListener(new KeyAdapter() {
+				public void keyTyped(KeyEvent e) {
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							checkButtonStates();
+						}
+					});
+					
+				}
+			});
 			commentTextArea.setEnabled(false);
+			
 		}
 
 		return commentTextArea;
+	}
+	
+	private void checkButtonStates() {
+		boolean changed = hasChanges();
+		
+		getApplyButton().setEnabled(changed);
+		getRevertButton().setEnabled(changed);
+	}
+	
+	public boolean hasChanges() {
+		if (null == config) {
+			return false;
+		}
+		
+		if (!getNameTextField().getText().equals(config.getName())) {
+			return true;
+		}
+		
+		if (!getHostTextField().getText().equals(config.getHost())) {
+			return true;
+		}
+		
+		if (!getHwAdressTextField().getText().equals(config.getHwAdress())) {
+			return true;
+		}
+		
+		if (!getCommentTextArea().getText().equals(config.getComment())) {
+			return true;
+		}
+		
+		int port = -1;
+			
+		try {
+			port = Integer.parseInt(getPortTextField().getText());
+		} catch (NumberFormatException e) {
+		}
+		
+		if (port != config.getPort()) {
+			return true;
+		}
+		
+		return false;
 	}
 
 }
 
 /*
  * $Log: EditHostPanel.java,v $
+ * Revision 1.2  2004/04/14 18:21:40  gon23
+ * *** empty log message ***
+ *
  * Revision 1.1  2004/04/14 11:13:37  gon23
  * *** empty log message ***
  *
