@@ -1,5 +1,5 @@
 /*
- * $Id: WakeUpUtil.java,v 1.4 2004/04/15 22:57:57 gon23 Exp $
+ * $Id: WakeUpUtil.java,v 1.5 2004/04/16 09:26:16 gon23 Exp $
  */
 package wol;
 
@@ -8,6 +8,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 /**
  * A class to wake up wake-on-lan enabled machines.
@@ -37,15 +38,6 @@ public class WakeUpUtil {
 	 * The default wakeup port: 9
 	 */
 	public final static int DEFAULT_PORT = 9;
-	
-	private final static byte[] SYNCHRONIZATION_STREAM_BYTES = new byte[] {
-		(byte) 0xff, 
-		(byte) 0xff, 
-		(byte) 0xff, 
-		(byte) 0xff, 
-		(byte) 0xff, 
-		(byte) 0xff 
-	};
 	
 	private WakeUpUtil() {
 		super();
@@ -119,24 +111,33 @@ public class WakeUpUtil {
 		DatagramSocket socket = new DatagramSocket();
 		
 		for (int i = 0; i < ethernetAddresses.length; i++) {
-			byte[] ethernetAddressBytes = ethernetAddresses[i].toBytes();
-			byte[] magicBytes = new byte[6 + 16 * ethernetAddressBytes.length];
+			byte[] wakeupFrame = createWakeupFrame(ethernetAddresses[i]);
 			
-			System.arraycopy(SYNCHRONIZATION_STREAM_BYTES, 0, magicBytes, 0, SYNCHRONIZATION_STREAM_BYTES.length);
-	        
-			for (int j = 6; j < magicBytes.length; j += ethernetAddressBytes.length) {
-				System.arraycopy(ethernetAddressBytes, 0, magicBytes, j, ethernetAddressBytes.length);
-			}
-			
-			DatagramPacket packet = new DatagramPacket(magicBytes, magicBytes.length, host, port);
+			DatagramPacket packet = new DatagramPacket(wakeupFrame, wakeupFrame.length, host, port);
 			
 			socket.send(packet);
 		}
+	}
+	
+	protected static byte[] createWakeupFrame(EthernetAddress ethernetAddress) {
+		byte[] ethernetAddressBytes = ethernetAddress.toBytes();
+		byte[] wakeupFrame = new byte[6 + 16 * ethernetAddressBytes.length];
+		
+		Arrays.fill(wakeupFrame, 0, 6, (byte)0xFF);
+        
+		for (int j = 6; j < wakeupFrame.length; j += ethernetAddressBytes.length) {
+			System.arraycopy(ethernetAddressBytes, 0, wakeupFrame, j, ethernetAddressBytes.length);
+		}
+		
+		return wakeupFrame;
 	}
 }
 
 /*
  * $Log: WakeUpUtil.java,v $
+ * Revision 1.5  2004/04/16 09:26:16  gon23
+ * extracted  createWakeupFrame
+ *
  * Revision 1.4  2004/04/15 22:57:57  gon23
  * *** empty log message ***
  *
