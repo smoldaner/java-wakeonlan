@@ -1,19 +1,16 @@
 /*
- * $Id: EthernetAddressTest.java,v 1.2 2004/05/17 21:59:17 gon23 Exp $
+ * $Id: EthernetAddressTest.java,v 1.1 2004/05/18 12:57:37 gon23 Exp $
  */
-package wol;
+package wol.configuration;
 
 import java.util.Arrays;
 
 import junit.framework.TestCase;
 
-import wol.configuration.EthernetAddress;
-import wol.configuration.IllegalEthernetAddressException;
 
 public class EthernetAddressTest extends TestCase {
 	private final static String NIC = "01:02:03:04:05:06";
 	private final static byte[] NIC_BYTES = new byte[]{ 1, 2, 3, 4, 5, 6 };
-	
 	/*
 	 * Class to test for void EthernetAddress(String)
 	 */
@@ -94,7 +91,7 @@ public class EthernetAddressTest extends TestCase {
 
 /*
  * $Log: EthernetAddressTest.java,v $
- * Revision 1.2  2004/05/17 21:59:17  gon23
+ * Revision 1.1  2004/05/18 12:57:37  gon23
  * *** empty log message ***
  *
  * Revision 1.1  2004/04/16 09:24:53  gon23
