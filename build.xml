@@ -1,4 +1,4 @@
-<!-- $Id: build.xml,v 1.6 2004/05/18 16:06:45 gon23 Exp $ -->
+<!-- $Id: build.xml,v 1.7 2004/06/03 13:21:43 gon23 Exp $ -->
 <project name="wakeonlan" default="deploy" basedir=".">
 	<property file="build.properties"/>
 	
@@ -111,6 +111,7 @@
 			<zipfileset dir="${deploy.javadoc.dir}" prefix="${ant.project.name}-${version}/doc/javadoc"/>
 			<zipfileset dir="${doc.dir}" prefix="${ant.project.name}-${version}/doc">
 				<include name="README"/>
+				<include name="COPYING"/>
 			</zipfileset>
 			<zipfileset dir="${basedir}" prefix="${ant.project.name}-${version}">
 				<include name="build.xml"/>
