@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Class-Path: lib/commons-cli-1.0.jar lib/commons-logging.jar
+Class-Path: lib/JSAP_1.03a.jar
 Main-Class: wol.WakeOnLan
 Implementation-Title: wakeonlan
 
