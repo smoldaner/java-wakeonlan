@@ -1,5 +1,5 @@
 /*
- * $Id: Configuration.java,v 1.3 2004/04/14 22:14:49 gon23 Exp $
+ * $Id: Configuration.java,v 1.4 2004/04/15 22:50:39 gon23 Exp $
  */
 package wol.configuration;
 
@@ -18,7 +18,11 @@ public class Configuration {
 	private final static Logger LOG = Logger.getLogger(Configuration.class.getName());
 	private Host[] hosts;
 	private File file;
-		
+	
+	public Configuration(String path) {
+		this(new File(path));
+	}
+	
 	public Configuration(File file) {
 		super();
 		this.file = file;
@@ -81,6 +85,9 @@ public class Configuration {
 
 /*
  * $Log: Configuration.java,v $
+ * Revision 1.4  2004/04/15 22:50:39  gon23
+ * New Constructor
+ *
  * Revision 1.3  2004/04/14 22:14:49  gon23
  * *** empty log message ***
  *
