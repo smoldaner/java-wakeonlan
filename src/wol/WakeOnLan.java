@@ -1,5 +1,5 @@
 /*
- * $Id: WakeOnLan.java,v 1.9 2004/04/27 19:08:16 gon23 Exp $
+ * $Id: WakeOnLan.java,v 1.10 2004/04/28 05:39:15 gon23 Exp $
  */
 package wol;
 
@@ -30,6 +30,7 @@ import wol.configuration.*;
 import wol.configuration.Configuration;
 import wol.configuration.Machine;
 import wol.resources.Messages;
+import wol.ui.MainFrame;
 import wol.ui.MainPanel;
 
 /**
@@ -99,9 +100,7 @@ public class WakeOnLan {
 					try {
 						wakeupEthernetAddresses(name, host, port);
 					} catch (IllegalEthernetAddressException e) {
-						Messages.ERROR_MESSAGES.getFormattedString(
-								"wakeup.notAHostOrEthernetAddress",
-								name);
+						Messages.ERROR_MESSAGES.getFormattedString("wakeup.notAHostOrEthernetAddress", name);
 					}
 				}
 		}
@@ -133,29 +132,9 @@ public class WakeOnLan {
 	}
 	
 	private void showGUI(Configuration config) {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {
-			LOG.info("Could not set system Look and Feel");
-		}
+		MainFrame mainFrame = new MainFrame(config);
 		
-		JFrame frame = new JFrame("Wakeonlan");
-		final MainPanel mainPanel = new MainPanel(config);
-		
-		mainPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-		frame.setContentPane(mainPanel);
-		frame.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				try {
-					mainPanel.saveConfig();
-				} catch (FileNotFoundException e1) {
-					LOG.warning(Messages.ERROR_MESSAGES.getString("save.fileNotFound.message"));
-				}
-				System.exit(0);
-			}
-		});
-		frame.pack();
-		frame.show();
+		mainFrame.show();
 	}
 	
 	private static String getConfigFilePath() {
@@ -283,6 +262,9 @@ public class WakeOnLan {
 
 /*
  * $Log: WakeOnLan.java,v $
+ * Revision 1.10  2004/04/28 05:39:15  gon23
+ * *** empty log message ***
+ *
  * Revision 1.9  2004/04/27 19:08:16  gon23
  * moved to wol.configuration
  *
