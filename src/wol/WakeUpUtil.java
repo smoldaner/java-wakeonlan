@@ -1,5 +1,5 @@
 /*
- * $Id: WakeUpUtil.java,v 1.1 2003/09/01 07:10:41 gon23 Exp $
+ * $Id: WakeUpUtil.java,v 1.2 2003/09/24 15:30:18 gon23 Exp $
  */
 package wol;
 
@@ -35,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
  * </blockqoute>
  * <br>
  * 
- * @author <a href="mailto:s.moldaner@gmx.net">Steffen Moldaner</a>
+ * @author <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#115;&#46;&#109;&#111;&#108;&#100;&#97;&#110;&#101;&#114;&#64;&#103;&#109;&#120;&#46;&#110;&#101;&#116;">Steffen Moldaner</a>
   */
 public class WakeUpUtil {
 	/**
@@ -208,6 +208,9 @@ public class WakeUpUtil {
 
 /*
  * $Log: WakeUpUtil.java,v $
+ * Revision 1.2  2003/09/24 15:30:18  gon23
+ * javadoc email spamblock
+ *
  * Revision 1.1  2003/09/01 07:10:41  gon23
  * Initial
  *
