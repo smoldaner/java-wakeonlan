@@ -1,4 +1,4 @@
-<!-- $Id: build.xml,v 1.1 2003/09/01 07:10:41 gon23 Exp $ -->
+<!-- $Id: build.xml,v 1.2 2004/04/21 21:51:23 gon23 Exp $ -->
 <project name="wakeonlan" default="all" basedir=".">
 	<property file="build.properties"/>
 	
@@ -11,6 +11,9 @@
 	
 	
 	<target name="init.build">
+		<tstamp>
+			<format property="BUILD" pattern="yyyy-MM-d-HH:mm" locale="en"/>
+		</tstamp>
 		<mkdir dir="${build.classes.dir}"/>
 	</target>
 	
@@ -27,10 +30,14 @@
 			optimize="${build.optimize}" 
 			target="${build.target}" 
 			classpathref="build.classpath" />
-		<copy todir="${build.classes.dir}">
+		<copy todir="${build.classes.dir}" overwrite="true">
 			<fileset dir="${src.dir}">
 				<include name="**/*.properties"/>
 			</fileset>
+			<filterset>
+				<filter token="VERSION" value="${version}"/>
+				<filter token="BUILD" value="${BUILD}"/>
+			</filterset>
 		</copy>
 	</target>
 	
