@@ -1,5 +1,5 @@
-<!-- $Id: build.xml,v 1.5 2004/05/18 14:27:20 gon23 Exp $ -->
-<project name="wakeonlan" default="all" basedir=".">
+<!-- $Id: build.xml,v 1.6 2004/05/18 16:06:45 gon23 Exp $ -->
+<project name="wakeonlan" default="deploy" basedir=".">
 	<property file="build.properties"/>
 	
 	<path id="build.classpath">
@@ -95,33 +95,34 @@
 			destfile="${deploy.zip.dir}/${ant.project.name}-${version}.zip"
 			update="false">
 			
-			<zipfileset dir="${src.dir}" prefix="src">
+			<zipfileset dir="${src.dir}" prefix="${ant.project.name}-${version}/src">
 				<include name="**/*.java"/>
-				<include name="**/*.propertis"/>
+				<include name="**/*.properties"/>
+				<include name="**/*.gif"/>
 			</zipfileset>
-			<zipfileset dir="${testsrc.dir}" prefix="testsrc">
+			<zipfileset dir="${testsrc.dir}" prefix="${ant.project.name}-${version}/testsrc">
 				<include name="**/*.java"/>
-				<include name="**/*.propertis"/>
+				<include name="**/*.properties"/>
 			</zipfileset>
-			<zipfileset dir="${lib.dir}" prefix="lib">
+			<zipfileset dir="${lib.dir}" prefix="${ant.project.name}-${version}/lib">
 				<include name="**/*.jar"/>
 			</zipfileset>
-			<zipfileset dir="${etc.dir}" prefix="etc" />
-			<zipfileset dir="${deploy.javadoc.dir}" prefix="doc/javadoc"/>
-			<zipfileset dir="${doc.dir}" prefix="doc">
+			<zipfileset dir="${etc.dir}" prefix="${ant.project.name}-${version}/etc" />
+			<zipfileset dir="${deploy.javadoc.dir}" prefix="${ant.project.name}-${version}/doc/javadoc"/>
+			<zipfileset dir="${doc.dir}" prefix="${ant.project.name}-${version}/doc">
 				<include name="README"/>
 			</zipfileset>
-			<fileset dir="${basedir}">
+			<zipfileset dir="${basedir}" prefix="${ant.project.name}-${version}">
 				<include name="build.xml"/>
 				<include name="build.properties"/>
-			</fileset>
-			<fileset dir="${etc.dir}">
+			</zipfileset>
+			<zipfileset dir="${etc.dir}" prefix="${ant.project.name}-${version}">
 				<include name="wakeonlan.sh"/>
 				<include name="wakeonlan.bat"/>
-			</fileset>
-			<fileset dir="${deploy.dir}">
+			</zipfileset>
+			<zipfileset dir="${deploy.dir}" prefix="${ant.project.name}-${version}">
 				<include name="${ant.project.name}.jar"/>
-			</fileset>
+			</zipfileset>
 		</zip>
 	</target>
 	
@@ -174,5 +175,7 @@
 		<antcall target="clean" />
 		<echo message="Deploy wakeonlan" />
 		<antcall target="deploy" />
+		<antcall target="deploy.ws" />
+		<antcall target="deploy.zip" />
 	</target>
 </project>

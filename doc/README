@@ -14,6 +14,8 @@ Optionally you can use ant to build the sources.
 USED LIBRARIES:
 
 - JSAP - Java Simple Argument Parser (http://www.martiansoftware.com/jsap/)
+- Optional JUnit to build the testsources -  (http://junit.org)
+- Optional Apache Ant (http://ant.apache.org)
 
 BUILD:
 Change to the directory you unpacked the sources. 
@@ -56,4 +58,4 @@ http://www.moldaner.de/wakeonlan/
 
 LINKS:
 
-http://gsd.di.uminho.pt/jpo/software/wakeonlan/mini-howto/wol-mini-howto-2.html
+About wakeonlan: http://gsd.di.uminho.pt/jpo/software/wakeonlan/mini-howto/wol-mini-howto-2.html
