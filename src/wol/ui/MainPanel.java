@@ -1,5 +1,5 @@
 /*
- * $Id: MainPanel.java,v 1.1 2004/04/08 22:10:06 gon23 Exp $
+ * $Id: MainPanel.java,v 1.2 2004/04/08 22:31:27 gon23 Exp $
  */
 package wol.ui;
 
@@ -14,6 +14,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.ListModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataListener;
 import javax.swing.text.NumberFormatter;
 
@@ -44,20 +45,22 @@ public class MainPanel extends JPanel {
 	private javax.swing.JPanel modifyPanel = null;
 	private javax.swing.JPanel wakeupPanel = null;
 	private WOLConfiguration currentConfig;
-	private List configurartions;
+	private ListListModel configurationsModel;
 
 	public MainPanel() {
 		super();
-		configurartions= new ArrayList();
+		ArrayList list = new ArrayList();
 		WOLConfiguration currentConfig = new WOLConfiguration(Messages.getString("defaultConfigurationName"));
-		configurartions.add(currentConfig);
+		
+		list.add(currentConfig);
+		this.configurationsModel = new ListListModel(list);
 		initialize();
 		initialize(currentConfig);
 	}
 	
 	public MainPanel(WOLConfiguration config, List configurations) {
 		super();
-		this.configurartions = configurations;
+		this.configurationsModel = new ListListModel(configurations);
 		initialize();
 		initialize(config);
 	}
@@ -120,17 +123,26 @@ public class MainPanel extends JPanel {
 
 	private javax.swing.JList getConfigurationsList() {
 		if(configurationsList == null) {
-			configurationsList = new javax.swing.JList(new AbstractListModel() {
-				public Object getElementAt(int index) {
-					return configurartions.get(index);
-				}
-
-				public int getSize() {
-					return configurartions.size();
+			configurationsList = new javax.swing.JList(configurationsModel);
+			configurationsList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+			configurationsList.addListSelectionListener(new javax.swing.event.ListSelectionListener() { 
+				public void valueChanged(javax.swing.event.ListSelectionEvent e) {
+					if (!e.getValueIsAdjusting()) {
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								WOLConfiguration config = (WOLConfiguration) configurationsList.getSelectedValue();
+								
+								if (null != config) {
+									initialize(config);
+									getDeleteButton().setEnabled(true);
+								} else {
+									getDeleteButton().setEnabled(false);
+								}
+							}
+						});   
+					}
 				}
 			});
-			configurationsList.setVisibleRowCount(8);
-			configurationsList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 		}
 		return configurationsList;
 	}
@@ -317,7 +329,8 @@ public class MainPanel extends JPanel {
 			newButton.addActionListener(new java.awt.event.ActionListener() { 
 				public void actionPerformed(java.awt.event.ActionEvent e) {    
 					WOLConfiguration newConfig = new WOLConfiguration(Messages.getString("defaultConfigurationName"));
-
+					
+					configurationsModel.add(newConfig);
 				}
 			});
 		}
@@ -330,7 +343,9 @@ public class MainPanel extends JPanel {
 			deleteButton.setText(Messages.getString("button.delete")); //$NON-NLS-1$
 			deleteButton.addActionListener(new java.awt.event.ActionListener() { 
 				public void actionPerformed(java.awt.event.ActionEvent e) {    
-					System.out.println("actionPerformed()"); // TODO Auto-generated Event stub actionPerformed()
+					int index = getConfigurationsList().getSelectedIndex();
+					
+					configurationsModel.remove(index);
 				}
 			});
 		}
@@ -376,10 +391,49 @@ public class MainPanel extends JPanel {
 		}
 		return wakeupPanel;
 	}
+	
+	private class ListListModel extends AbstractListModel {
+			private List list;
+			
+			public ListListModel(List list) {
+				this.list = list;
+			}
+			
+			public Object getElementAt(int index) {
+				return list.get(index);
+			}
+	
+			public int getSize() {
+				return list.size();
+			}
+			
+			public boolean add(Object object) {
+				if (list.add(object)) {
+					fireIntervalAdded(this, list.size() - 1, list.size() - 1);
+					return true;
+				} else {
+					return false;
+				}
+			}
+			
+			public Object remove (int index) {
+				Object retVal = list.remove(index);
+				
+				fireIntervalRemoved(this, index, index);
+				
+				return retVal;
+				
+			}
+	}
 }  //  @jve:visual-info  decl-index=0 visual-constraint="10,10"
+
+
 
 /*
  * $Log: MainPanel.java,v $
+ * Revision 1.2  2004/04/08 22:31:27  gon23
+ * *** empty log message ***
+ *
  * Revision 1.1  2004/04/08 22:10:06  gon23
  * Initial
  *
