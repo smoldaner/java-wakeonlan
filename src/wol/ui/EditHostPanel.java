@@ -1,5 +1,5 @@
 /*
- * $Id: EditHostPanel.java,v 1.2 2004/04/14 18:21:40 gon23 Exp $
+ * $Id: EditHostPanel.java,v 1.3 2004/04/14 21:52:30 gon23 Exp $
  */
 package wol.ui;
 
@@ -71,7 +71,8 @@ public class EditHostPanel extends JPanel {
 	private JButton getRevertButton() {
 		if (null == revertButton) {
 			revertButton = new JButton();
-			revertButton.setText(Messages.getString("button.revert"));
+			revertButton.setText(Messages.getString("button.revert.label"));
+			revertButton.setToolTipText(Messages.getString("button.revert.tooltip"));
 			revertButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					SwingUtilities.invokeLater(new Runnable() {
@@ -89,7 +90,8 @@ public class EditHostPanel extends JPanel {
 	private JButton getApplyButton() {
 		if (null == applyButton) {
 			applyButton = new JButton();
-			applyButton.setText(Messages.getString("button.apply"));
+			applyButton.setText(Messages.getString("button.apply.label"));
+			applyButton.setToolTipText(Messages.getString("button.apply.tooltip"));
 			applyButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					SwingUtilities.invokeLater(new Runnable() {
@@ -254,7 +256,7 @@ public class EditHostPanel extends JPanel {
 	 */	
 	public synchronized void setConfig(Host config) {
 		if (hasChanges()) {
-			if (JOptionPane.showConfirmDialog(this, Errors.getFormattedString("host.unsavedChanges.message", config.getName()), Errors.getString("host.unsavedChanges.title"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+			if (JOptionPane.showConfirmDialog(this, Errors.getFormattedString("host.unsavedChanges.message", this.config.getName()), Errors.getString("host.unsavedChanges.title"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
 				applyChanges();
 			}
 		}
@@ -444,6 +446,8 @@ public class EditHostPanel extends JPanel {
 		if (commentTextArea == null) {
 			commentTextArea = new javax.swing.JTextArea();
 			commentTextArea.setRows(15);
+			commentTextArea.setWrapStyleWord(true);
+			commentTextArea.setLineWrap(true);
 			commentTextArea.setToolTipText(Messages.getString("comment.tooltip"));
 			commentTextArea.addKeyListener(new KeyAdapter() {
 				public void keyTyped(KeyEvent e) {
@@ -508,6 +512,9 @@ public class EditHostPanel extends JPanel {
 
 /*
  * $Log: EditHostPanel.java,v $
+ * Revision 1.3  2004/04/14 21:52:30  gon23
+ * *** empty log message ***
+ *
  * Revision 1.2  2004/04/14 18:21:40  gon23
  * *** empty log message ***
  *

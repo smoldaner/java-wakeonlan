@@ -1,5 +1,5 @@
 /*
- * $Id: MainPanel.java,v 1.4 2004/04/14 18:21:40 gon23 Exp $
+ * $Id: MainPanel.java,v 1.5 2004/04/14 21:52:30 gon23 Exp $
  */
 package wol.ui;
 
@@ -78,6 +78,19 @@ public class MainPanel extends JPanel {
 		this.configurationsModel = new HostsModel(config.getHosts());
 		initialize();
 	}
+	
+	public void setConfiguration(Configuration config) {
+		try {
+			saveConfig();
+		} catch (FileNotFoundException e1) {
+			LOG.log(Level.SEVERE, "Can't write config", e1);
+			JOptionPane.showMessageDialog(this, Errors.getString("save.fileNotFound.message"), Errors.getString("save.fileNotFound.title"), JOptionPane.ERROR_MESSAGE);
+		}
+		
+		this.config = config;
+		this.configurationsModel = new HostsModel(config.getHosts());
+		getConfigurationsList().setModel(configurationsModel);
+	}
 
 	private void initialize() {
 		this.setLayout(new java.awt.BorderLayout());
@@ -116,6 +129,19 @@ public class MainPanel extends JPanel {
 		if (null == openMenuItem) {
 			openMenuItem = new JMenuItem(Messages.getString("menu.file.open.label"));
 			openMenuItem.setMnemonic(Messages.getMnemonic("menu.file.open.mnemonic"));
+			openMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					JFileChooser fileChooser = new JFileChooser(config.getFile());
+					
+					fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+					if (fileChooser.showOpenDialog(MainPanel.this) == JFileChooser.APPROVE_OPTION) {
+						File file = fileChooser.getSelectedFile();
+						Configuration newConfig = new Configuration(file);
+						
+						setConfiguration(newConfig);
+					}
+				}
+			});
 		}
 		
 		return openMenuItem;
@@ -171,9 +197,19 @@ public class MainPanel extends JPanel {
 					
 					fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 					
-					if (fileChooser.showOpenDialog(MainPanel.this) == JFileChooser.APPROVE_OPTION) {
+					if (fileChooser.showSaveDialog(MainPanel.this) == JFileChooser.APPROVE_OPTION) {
+						File file = fileChooser.getSelectedFile();
+						
+						if (file.exists()) {
+							if (JOptionPane.showConfirmDialog(MainPanel.this, 
+								Errors.getFormattedString("save.fileExists.message", file.getAbsoluteFile()), 
+								Errors.getFormattedString("save.fileExists.title", file.getAbsoluteFile()), JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION){
+									return;
+							}
+						}
+						
 						try {
-							saveConfig(fileChooser.getSelectedFile());
+							saveConfig(file);
 						} catch (FileNotFoundException e1) {
 							LOG.log(Level.SEVERE, "Can't write config", e1);
 							JOptionPane
@@ -208,6 +244,30 @@ public class MainPanel extends JPanel {
 		if (null == newConfigMenuItem) {
 			newConfigMenuItem = new JMenuItem(Messages.getString("menu.file.new.config.label"));
 			newConfigMenuItem.setMnemonic(Messages.getMnemonic("menu.file.new.config.mnemonic"));
+			newConfigMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							JFileChooser fileChooser = new JFileChooser(config.getFile());
+							
+							fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+							if (fileChooser.showOpenDialog(MainPanel.this) == JFileChooser.APPROVE_OPTION) {
+								File file = fileChooser.getSelectedFile();
+								
+								if (file.exists()) {
+									if (JOptionPane.showConfirmDialog(MainPanel.this, 
+										Errors.getFormattedString("save.fileExists.message", file.getAbsoluteFile()), 
+										Errors.getFormattedString("save.fileExists.title", file.getAbsoluteFile()), JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION){
+											return;
+									}
+								}
+								
+								setConfiguration(new Configuration(file));
+							}
+						}
+					});
+				}
+			});
 		}
 		
 		return newConfigMenuItem;
@@ -217,6 +277,15 @@ public class MainPanel extends JPanel {
 		if (null == newHostMenuItem) {
 			newHostMenuItem = new JMenuItem(Messages.getString("menu.file.new.host.label"));
 			newHostMenuItem.setMnemonic(Messages.getMnemonic("menu.file.new.host.mnemonic"));
+			newHostMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							newHost();
+						}
+					});
+				}
+			});
 		}
 		
 		return newHostMenuItem;
@@ -247,13 +316,15 @@ public class MainPanel extends JPanel {
 	private javax.swing.JButton getWakeupButton() {
 		if(wakeupButton == null) {
 			wakeupButton = new javax.swing.JButton();
-			wakeupButton.setText(Messages.getString("button.wakeup")); //$NON-NLS-1$
+			wakeupButton.setText(Messages.getString("button.wakeup.label")); //$NON-NLS-1$
+			wakeupButton.setToolTipText(Messages.getString("button.wakeup.tooltip"));
 			wakeupButton.addActionListener(new java.awt.event.ActionListener() { 
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					getEditHostPanel().applyChanges();
 					System.out.println("actionPerformed()"); // TODO Auto-generated Event stub actionPerformed()
 				}
 			});
+			wakeupButton.setEnabled(false);
 		}
 		return wakeupButton;
 	}
@@ -368,21 +439,27 @@ public class MainPanel extends JPanel {
 	private javax.swing.JButton getNewButton() {
 		if(newButton == null) {
 			newButton = new javax.swing.JButton();
-			newButton.setText(Messages.getString("button.new")); //$NON-NLS-1$
+			newButton.setText(Messages.getString("button.new.label")); //$NON-NLS-1$
+			newButton.setToolTipText(Messages.getString("button.new.tooltip"));
 			newButton.addActionListener(new java.awt.event.ActionListener() { 
 				public void actionPerformed(java.awt.event.ActionEvent e) {    
-					int index = configurationsModel.newHost();
-					getConfigurationsList().setSelectedIndex(index);
+					newHost();
 				}
 			});
 		}
 		return newButton;
 	}
+	
+	private void newHost() {
+		int index = configurationsModel.newHost();
+		getConfigurationsList().setSelectedIndex(index);
+	}
 
 	private javax.swing.JButton getDeleteButton() {
 		if(deleteButton == null) {
 			deleteButton = new javax.swing.JButton();
-			deleteButton.setText(Messages.getString("button.delete")); //$NON-NLS-1$
+			deleteButton.setText(Messages.getString("button.delete.label")); //$NON-NLS-1$
+			deleteButton.setToolTipText(Messages.getString("button.delete.tooltip"));
 			deleteButton.addActionListener(new java.awt.event.ActionListener() { 
 				public void actionPerformed(java.awt.event.ActionEvent e) {    
 					int[] indices = getConfigurationsList().getSelectedIndices();
@@ -394,6 +471,7 @@ public class MainPanel extends JPanel {
 					
 				}
 			});
+			deleteButton.setEnabled(false);
 		}
 		return deleteButton;
 	}
@@ -526,6 +604,9 @@ public class MainPanel extends JPanel {
 
 /*
  * $Log: MainPanel.java,v $
+ * Revision 1.5  2004/04/14 21:52:30  gon23
+ * *** empty log message ***
+ *
  * Revision 1.4  2004/04/14 18:21:40  gon23
  * *** empty log message ***
  *
