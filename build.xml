@@ -1,4 +1,4 @@
-<!-- $Id: build.xml,v 1.4 2004/05/17 21:59:33 gon23 Exp $ -->
+<!-- $Id: build.xml,v 1.5 2004/05/18 14:27:20 gon23 Exp $ -->
 <project name="wakeonlan" default="all" basedir=".">
 	<property file="build.properties"/>
 	
@@ -66,9 +66,11 @@
 			packagenames="wol.*"
 			sourcepath="${src.dir}"
 			windowtitle="wakeonlan - API"
-			author="true">
+			author="true"
+			classpathref="build.classpath">
 			<doctitle><![CDATA[<h1>wakeonlan</h1>]]></doctitle>
 			<link href="http://java.sun.com/j2se/1.4.2/docs/api/"/>
+			<link href="http://www.martiansoftware.com/jsap/doc/javadoc/"/>
 		</javadoc>
 	</target>
 	
@@ -104,6 +106,7 @@
 			<zipfileset dir="${lib.dir}" prefix="lib">
 				<include name="**/*.jar"/>
 			</zipfileset>
+			<zipfileset dir="${etc.dir}" prefix="etc" />
 			<zipfileset dir="${deploy.javadoc.dir}" prefix="doc/javadoc"/>
 			<zipfileset dir="${doc.dir}" prefix="doc">
 				<include name="README"/>
@@ -111,6 +114,10 @@
 			<fileset dir="${basedir}">
 				<include name="build.xml"/>
 				<include name="build.properties"/>
+			</fileset>
+			<fileset dir="${etc.dir}">
+				<include name="wakeonlan.sh"/>
+				<include name="wakeonlan.bat"/>
 			</fileset>
 			<fileset dir="${deploy.dir}">
 				<include name="${ant.project.name}.jar"/>
@@ -122,6 +129,12 @@
 		<jar basedir="${build.classes.dir}" 
 			destfile="${deploy.dir}/${ant.project.name}.jar" 
 			manifest="${build.manifest}" />
+		<copy todir="${deploy.dir}">
+			<fileset dir="${etc.dir}">
+				<include name="wakeonlan.sh"/>
+				<include name="wakeonlan.bat"/>
+			</fileset>
+		</copy>
 		<copy todir="${deploy.lib.dir}">
 			<fileset dir="${lib.dir}" />
 		</copy>
