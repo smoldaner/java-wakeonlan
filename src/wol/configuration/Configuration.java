@@ -1,5 +1,5 @@
 /*
- * $Id: Configuration.java,v 1.5 2004/04/21 20:39:35 gon23 Exp $
+ * $Id: Configuration.java,v 1.6 2004/04/28 05:39:02 gon23 Exp $
  */
 package wol.configuration;
 
@@ -20,6 +20,10 @@ public class Configuration {
 	private final static Logger LOG = Logger.getLogger(Configuration.class.getName());
 	private Machine[] machines;
 	private File file;
+	
+	public Configuration() {
+		this(System.getProperty("user.home") + File.separatorChar + ".wakeonlan.hosts");
+	}
 	
 	/**
 	 * Creates a new configuration with the given path.
@@ -141,6 +145,9 @@ public class Configuration {
 
 /*
  * $Log: Configuration.java,v $
+ * Revision 1.6  2004/04/28 05:39:02  gon23
+ * Added default constructor
+ *
  * Revision 1.5  2004/04/21 20:39:35  gon23
  * javadoc
  *
