@@ -1,9 +1,10 @@
 /*
- * $Id: MainPanel.java,v 1.11 2004/04/27 19:08:16 gon23 Exp $
+ * $Id: MainPanel.java,v 1.12 2004/04/28 05:38:35 gon23 Exp $
  */
 package wol.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -42,6 +43,7 @@ import wol.resources.Messages;
  * @author <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#115;&#46;&#109;&#111;&#108;&#100;&#97;&#110;&#101;&#114;&#64;&#103;&#109;&#120;&#46;&#110;&#101;&#116;">Steffen Moldaner</a>
  */
 public class MainPanel extends JPanel {
+	private StatusBar statusBar;
 	private JMenuItem aboutMenuItem;
 	private JMenu infoMenu;
 	private final static Logger LOG = Logger.getLogger(MainPanel.class.getName());
@@ -69,6 +71,7 @@ public class MainPanel extends JPanel {
 	private JMenuItem openMenuItem;
 	private JMenuItem exitMenuItem;
 	private JPanel configurationsButtonPanel;
+	private boolean inWakeup = false;
 
 	public MainPanel() {
 		super();
@@ -103,8 +106,16 @@ public class MainPanel extends JPanel {
 	private void initialize() {
 		this.setLayout(new java.awt.BorderLayout());
 		this.add(getMenuBar(), BorderLayout.NORTH);
-		this.add(getButtonPanel(), java.awt.BorderLayout.SOUTH);
+		this.add(getStatusBar(), java.awt.BorderLayout.SOUTH);
 		this.add(getCenterPanel(), java.awt.BorderLayout.CENTER);
+	}
+	
+	private StatusBar getStatusBar() {
+		if (null == statusBar) {
+			statusBar = new StatusBar();
+		}
+		
+		return statusBar;
 	}
 	
 	private JMenuBar getMenuBar() {
@@ -363,12 +374,12 @@ public class MainPanel extends JPanel {
 			wakeupButton.setToolTipText(Messages.UI_MESSAGES.getString("button.wakeup.tooltip"));
 			wakeupButton.addActionListener(new java.awt.event.ActionListener() { 
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					SwingUtilities.invokeLater(new Runnable() {
+					new Thread(new Runnable() {
 						public void run() {
 							getEditHostPanel().applyChanges();
 							wakeup();
 						}
-					});
+					}).start();
 				}
 			});
 			wakeupButton.setEnabled(false);
@@ -377,41 +388,67 @@ public class MainPanel extends JPanel {
 	}
 
 	protected void wakeup() {
+		inWakeup = true;
+		boolean errors = false;
+		StatusBar statusbar = getStatusBar();
 		Object[] hosts = getConfigurationsList().getSelectedValues();
 		
+		statusbar.setStatusText(Messages.UI_MESSAGES.getString("status.wakeup.start"));
+		statusbar.setProgressMinimum(0);
+		statusbar.setProgressMaximum(hosts.length);
+		statusbar.setProgressColor(Color.GREEN);
+				
 		for (int i = 0; i < hosts.length; i++) {
-			Machine hostConfig = (Machine) hosts[i];
-
+			Machine machine = (Machine) hosts[i];
+			
+			statusbar.setStatusText(Messages.UI_MESSAGES.getFormattedString("status.wakeup.wakeup", machine.getName()));
+			
 			try {
-				EthernetAddress nic = new EthernetAddress(hostConfig.getEthernetAddress());
-				InetAddress host = InetAddress.getByName(hostConfig.getHost());
-				int port = hostConfig.getPort();
+				EthernetAddress nic = new EthernetAddress(machine.getEthernetAddress());
+				InetAddress host = InetAddress.getByName(machine.getHost());
+				int port = machine.getPort();
 				
 				WakeUpUtil.wakeup(nic, host, port);
 			} catch (UnknownHostException e) {
-				String errMsg = Messages.ERROR_MESSAGES.getFormattedString("wakeup.unknownHost.message", hostConfig.getName(), hostConfig.getHost());
+				errors = true;
+				statusbar.setProgressColor(Color.RED);
+				String errMsg = Messages.ERROR_MESSAGES.getFormattedString("wakeup.unknownHost.message", machine.getName(), machine.getHost());
 				
 				LOG.log(Level.WARNING, errMsg, e);
 				JOptionPane.showMessageDialog(this, errMsg,
 					Messages.ERROR_MESSAGES.getString("wakeup.unknowHost.title"),
 						JOptionPane.ERROR_MESSAGE);
 			} catch (IllegalEthernetAddressException e) {
-				String errMsg = Messages.ERROR_MESSAGES.getFormattedString("wakeup.invalidEthernetAddress.message", hostConfig.getName(), hostConfig.getEthernetAddress()); 
+				errors = true;
+				statusbar.setProgressColor(Color.RED);
+				String errMsg = Messages.ERROR_MESSAGES.getFormattedString("wakeup.invalidEthernetAddress.message", machine.getName(), machine.getEthernetAddress()); 
 				
 				LOG.log(Level.WARNING, errMsg, e);
 				JOptionPane.showMessageDialog(this, errMsg, 
 						Messages.ERROR_MESSAGES.getString("wakeup.invalidEthernetAddress.title"),
 						JOptionPane.ERROR_MESSAGE);
 			} catch (IOException e) {
-				String errMsg = Messages.ERROR_MESSAGES.getFormattedString("wakeup.io.message", hostConfig.getName());
+				errors = true;
+				statusbar.setProgressColor(Color.RED);
+				String errMsg = Messages.ERROR_MESSAGES.getFormattedString("wakeup.io.message", machine.getName());
 				
 				LOG.log(Level.WARNING, errMsg, e);
 				JOptionPane.showMessageDialog(this, errMsg,
 						Messages.ERROR_MESSAGES
 								.getString("wakeup.io.title"),
 						JOptionPane.ERROR_MESSAGE);
+			} finally {
+				statusbar.setProgressValue(i+1);
+				try {
+					Thread.sleep(200);
+				} catch (InterruptedException e1) {
+					//Ignore
+				}
 			}
 		}
+		
+		statusbar.setStatusText(errors ? Messages.UI_MESSAGES.getString("status.wakeup.doneWithErrors") : Messages.UI_MESSAGES.getString("status.wakeup.done"));
+		inWakeup = false;
 	}
 
 	private javax.swing.JPanel getCenterPanel() {
@@ -420,7 +457,9 @@ public class MainPanel extends JPanel {
 			centerPanel.setLayout(new GridBagLayout());
 			GridBagConstraints editHostConstraints = new GridBagConstraints();
 			GridBagConstraints configurationsConstraints = new GridBagConstraints();
+			GridBagConstraints buttonConstraints = new GridBagConstraints();
 			Insets insets = new Insets(2, 2, 2, 2);
+			
 			editHostConstraints.gridx = 1;
 			editHostConstraints.gridy = 0;
 			editHostConstraints.weightx = 0.3D;
@@ -435,8 +474,17 @@ public class MainPanel extends JPanel {
 			configurationsConstraints.fill = GridBagConstraints.BOTH;
 			configurationsConstraints.insets = insets;
 			
+			buttonConstraints.gridx = 0;
+			buttonConstraints.gridy = 1;
+			buttonConstraints.weightx = 1.0D;
+			buttonConstraints.weighty = 0D;
+			buttonConstraints.gridwidth = 2;
+			buttonConstraints.fill = GridBagConstraints.HORIZONTAL;
+			buttonConstraints.insets = insets;
+			
 			centerPanel.add(getEditHostPanel(), editHostConstraints);
 			centerPanel.add(getConfigurationsPanel(), configurationsConstraints);
+			centerPanel.add(getButtonPanel(), buttonConstraints);
 		}
 		return centerPanel;
 	}
@@ -476,7 +524,14 @@ public class MainPanel extends JPanel {
 								
 								if (selectedHosts.length == 1) {
 									newConfig = (Machine) selectedHosts[0];
-								} 
+									getStatusBar().setStatusText(newConfig.getName());
+								} else {
+									getStatusBar().setStatusText(Messages.UI_MESSAGES.getString("status.default"));
+								}
+								
+								if (!inWakeup) {
+									getStatusBar().setProgressValue(0);
+								}
 
 								getEditHostPanel().setConfig(newConfig);
 							}
@@ -488,8 +543,6 @@ public class MainPanel extends JPanel {
 		
 		return configurationsList;
 	}
-
-
 
 	private javax.swing.JPanel getConfigurationsPanel() {
 		if(configurationsPanel == null) {
@@ -689,6 +742,9 @@ public class MainPanel extends JPanel {
 
 /*
  * $Log: MainPanel.java,v $
+ * Revision 1.12  2004/04/28 05:38:35  gon23
+ * Added Statusbar
+ *
  * Revision 1.11  2004/04/27 19:08:16  gon23
  * moved to wol.configuration
  *

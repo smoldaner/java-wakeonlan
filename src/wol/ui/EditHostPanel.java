@@ -1,5 +1,5 @@
 /*
- * $Id: EditHostPanel.java,v 1.8 2004/04/21 20:41:21 gon23 Exp $
+ * $Id: EditHostPanel.java,v 1.9 2004/04/28 05:38:35 gon23 Exp $
  */
 package wol.ui;
 
@@ -178,6 +178,7 @@ public class EditHostPanel extends JPanel {
 			hostTextFieldConstraints.insets = insets;
 			
 			portTextFieldConstraints.weightx = 0.0D;
+			portTextFieldConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 			portTextFieldConstraints.gridx = 3;
 			portTextFieldConstraints.gridy = 4;
 			portTextFieldConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
@@ -219,6 +220,7 @@ public class EditHostPanel extends JPanel {
 			nameLabel = new javax.swing.JLabel();
 			nameLabel.setText(Messages.UI_MESSAGES.getString("name.label")); //$NON-NLS-1$
 			nameLabel.setLabelFor(getNameTextField());
+			nameLabel.setEnabled(false);
 		}
 		return nameLabel;
 	}
@@ -303,6 +305,7 @@ public class EditHostPanel extends JPanel {
 			hostLabel = new javax.swing.JLabel();
 			hostLabel.setText(Messages.UI_MESSAGES.getString("host.label")); //$NON-NLS-1$
 			hostLabel.setLabelFor(getHostTextField());
+			hostLabel.setEnabled(false);
 		}
 		return hostLabel;
 	}
@@ -332,6 +335,7 @@ public class EditHostPanel extends JPanel {
 			portLabel = new javax.swing.JLabel();
 			portLabel.setText(Messages.UI_MESSAGES.getString("port.label")); //$NON-NLS-1$
 			portLabel.setLabelFor(getPortTextField());
+			portLabel.setEnabled(false);
 		}
 		return portLabel;
 	}
@@ -380,6 +384,7 @@ public class EditHostPanel extends JPanel {
 			ethernetAddressLabel = new javax.swing.JLabel();
 			ethernetAddressLabel.setText(Messages.UI_MESSAGES.getString("ethernetAddress.label")); //$NON-NLS-1$
 			ethernetAddressLabel.setLabelFor(getEthernetAddressTextField());
+			ethernetAddressLabel.setEnabled(false);
 		}
 		return ethernetAddressLabel;
 	}
@@ -432,11 +437,15 @@ public class EditHostPanel extends JPanel {
 			getEthernetAddressTextField().setValue(null);
 			getCommentTextArea().setText(null);
 		}
-
+		getHostLabel().setEnabled(enabled);
 		getHostTextField().setEnabled(enabled);
+		getNameLabel().setEnabled(enabled);
 		getNameTextField().setEnabled(enabled);
+		getPortLabel().setEnabled(enabled);
 		getPortTextField().setEnabled(enabled);
+		getEthernetAddressLabel().setEnabled(enabled);
 		getEthernetAddressTextField().setEnabled(enabled);
+		getCommentLabel().setEnabled(enabled);
 		getCommentTextArea().setEnabled(enabled);
 		
 		checkButtonStates();
@@ -447,6 +456,7 @@ public class EditHostPanel extends JPanel {
 			commentLabel = new javax.swing.JLabel();
 			commentLabel.setText(Messages.UI_MESSAGES.getString("comment.label")); //$NON-NLS-1$
 			commentLabel.setLabelFor(getCommentTextArea());
+			commentLabel.setEnabled(false);
 		}
 		return commentLabel;
 	}
@@ -495,10 +505,6 @@ public class EditHostPanel extends JPanel {
 			return false;
 		}
 		
-		if (!getEthernetAddressTextField().isEditValid()) {
-			return false;
-		}
-		
 		if (!getNameTextField().getText().equals(config.getName())) {
 			return true;
 		}
@@ -533,6 +539,9 @@ public class EditHostPanel extends JPanel {
 
 /*
  * $Log: EditHostPanel.java,v $
+ * Revision 1.9  2004/04/28 05:38:35  gon23
+ * Added Statusbar
+ *
  * Revision 1.8  2004/04/21 20:41:21  gon23
  * javadoc
  *
