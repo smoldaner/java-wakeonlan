@@ -1,5 +1,5 @@
 /*
- * $Id: WakeOnLan.java,v 1.6 2004/04/15 22:57:57 gon23 Exp $
+ * $Id: WakeOnLan.java,v 1.7 2004/04/16 09:26:27 gon23 Exp $
  */
 package wol;
 
@@ -8,9 +8,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -278,6 +276,9 @@ public class WakeOnLan {
 
 /*
  * $Log: WakeOnLan.java,v $
+ * Revision 1.7  2004/04/16 09:26:27  gon23
+ * *** empty log message ***
+ *
  * Revision 1.6  2004/04/15 22:57:57  gon23
  * *** empty log message ***
  *
