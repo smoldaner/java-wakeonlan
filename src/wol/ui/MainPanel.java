@@ -1,5 +1,5 @@
 /*
- * $Id: MainPanel.java,v 1.8 2004/04/16 12:27:11 gon23 Exp $
+ * $Id: MainPanel.java,v 1.9 2004/04/21 20:41:31 gon23 Exp $
  */
 package wol.ui;
 
@@ -73,17 +73,17 @@ public class MainPanel extends JPanel {
 	public MainPanel() {
 		super();
 		ArrayList list = new ArrayList();
-		Host currentConfig = new Host(Messages.UI_MESSAGES.getString("defaultConfigurationName"));
+		Machine currentConfig = new Machine(Messages.UI_MESSAGES.getString("defaultConfigurationName"));
 		
 		list.add(currentConfig);
-		this.configurationsModel = new HostsModel(new Host[0]);
+		this.configurationsModel = new HostsModel(new Machine[0]);
 		initialize();
 	}
 	
 	public MainPanel(Configuration config) {
 		super();
 		this.config = config;
-		this.configurationsModel = new HostsModel(config.getHosts());
+		this.configurationsModel = new HostsModel(config.getMachines());
 		initialize();
 	}
 	
@@ -96,7 +96,7 @@ public class MainPanel extends JPanel {
 		}
 		
 		this.config = config;
-		this.configurationsModel = new HostsModel(config.getHosts());
+		this.configurationsModel = new HostsModel(config.getMachines());
 		getConfigurationsList().setModel(configurationsModel);
 	}
 
@@ -181,16 +181,16 @@ public class MainPanel extends JPanel {
 		return saveMenuItem;
 	}
 	
-	public void updateConfig() {
-		config.setHosts(configurationsModel.getHosts());
+	private void updateConfig() {
+		config.setMachines(configurationsModel.getHosts());
 	}
 	
 	private void saveConfig(File file) throws FileNotFoundException {
 		updateConfig();
-		config.saveConfig(file);
+		config.saveConfigAs(file);
 	}
 	
-	private void saveConfig() throws FileNotFoundException {
+	public void saveConfig() throws FileNotFoundException {
 		updateConfig();
 		config.saveConfig();
 	}
@@ -345,7 +345,7 @@ public class MainPanel extends JPanel {
 		Object[] hosts = getConfigurationsList().getSelectedValues();
 		
 		for (int i = 0; i < hosts.length; i++) {
-			Host hostConfig = (Host) hosts[i];
+			Machine hostConfig = (Machine) hosts[i];
 
 			try {
 				EthernetAddress nic = new EthernetAddress(hostConfig.getEthernetAddress());
@@ -436,11 +436,11 @@ public class MainPanel extends JPanel {
 								getDeleteButton().setEnabled(!configurationsList.isSelectionEmpty());
 								getWakeupButton().setEnabled(!configurationsList.isSelectionEmpty());
 								
-								Host newConfig = null;
+								Machine newConfig = null;
 								Object[] selectedHosts = configurationsList.getSelectedValues();
 								
 								if (selectedHosts.length == 1) {
-									newConfig = (Host) selectedHosts[0];
+									newConfig = (Machine) selectedHosts[0];
 								} 
 
 								getEditHostPanel().setConfig(newConfig);
@@ -538,8 +538,8 @@ public class MainPanel extends JPanel {
 		private List hosts;
 		private Comparator hostComparator = new Comparator() {
 			public int compare(Object o1, Object o2) {
-				String hostname1 = (null == o1 ? null : ((Host) o1).getName());
-				String hostname2 = (null == o2 ? null : ((Host) o2).getName());
+				String hostname1 = (null == o1 ? null : ((Machine) o1).getName());
+				String hostname2 = (null == o2 ? null : ((Machine) o2).getName());
 				
 				if (null == hostname1) {
 					hostname1 = "";
@@ -553,11 +553,11 @@ public class MainPanel extends JPanel {
 			}
 		};
 		
-		public HostsModel(Host[] hosts) {
+		public HostsModel(Machine[] hosts) {
 			this.hosts = new ArrayList();
 			
 			for (int i = 0; i < hosts.length; i++) {
-				Host host = hosts[i];
+				Machine host = hosts[i];
 				
 				host.addPropertyChangeListener(this);
 				this.hosts.add(host);
@@ -578,11 +578,11 @@ public class MainPanel extends JPanel {
 			}
 		}
 		
-		public Host deleteHost(int index) {
-			Host oldHost;
+		public Machine deleteHost(int index) {
+			Machine oldHost;
 			
 			synchronized(hosts) {
-				oldHost = (Host) hosts.remove(index);
+				oldHost = (Machine) hosts.remove(index);
 			}
 			
 			oldHost.removePropertyChangeListener(this);
@@ -592,7 +592,7 @@ public class MainPanel extends JPanel {
 		}
 
 		public int newHost() {
-			Host newHost = new Host(getNewName(Messages.UI_MESSAGES.getString("defaultConfigurationName")));
+			Machine newHost = new Machine(getNewName(Messages.UI_MESSAGES.getString("defaultConfigurationName")));
 			
 			newHost.addPropertyChangeListener(this);
 			int index;
@@ -609,7 +609,7 @@ public class MainPanel extends JPanel {
 		
 		protected String getNewName(String defaultName) {
 			for (Iterator iter = hosts.iterator(); iter.hasNext();) {
-				Host host = (Host) iter.next();
+				Machine host = (Machine) iter.next();
 				
 				if (defaultName.equalsIgnoreCase(host.getName())) {
 					return getNewName(defaultName, 1);
@@ -623,7 +623,7 @@ public class MainPanel extends JPanel {
 			String newName = defaultName  + " ("  + counter + ')';
 			
 			for (Iterator iter = hosts.iterator(); iter.hasNext();) {
-				Host host = (Host) iter.next();
+				Machine host = (Machine) iter.next();
 				
 				if (newName.equalsIgnoreCase(host.getName())) {
 					return getNewName(defaultName, ++counter);
@@ -641,10 +641,10 @@ public class MainPanel extends JPanel {
 			}
 		}
 		
-		public Host[] getHosts() {
-			Host[] retHosts = new Host[hosts.size()];
+		public Machine[] getHosts() {
+			Machine[] retHosts = new Machine[hosts.size()];
 			
-			return (Host[]) hosts.toArray(retHosts);
+			return (Machine[]) hosts.toArray(retHosts);
 		}
 
 	}
@@ -654,6 +654,9 @@ public class MainPanel extends JPanel {
 
 /*
  * $Log: MainPanel.java,v $
+ * Revision 1.9  2004/04/21 20:41:31  gon23
+ * javadoc
+ *
  * Revision 1.8  2004/04/16 12:27:11  gon23
  * *** empty log message ***
  *

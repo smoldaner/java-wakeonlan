@@ -1,5 +1,5 @@
 /*
- * $Id: EditHostPanel.java,v 1.7 2004/04/16 12:27:11 gon23 Exp $
+ * $Id: EditHostPanel.java,v 1.8 2004/04/21 20:41:21 gon23 Exp $
  */
 package wol.ui;
 
@@ -40,7 +40,7 @@ public class EditHostPanel extends JPanel {
 	private javax.swing.JLabel commentLabel = null;
 	private javax.swing.JScrollPane commentScrollPane = null;
 	private javax.swing.JTextArea commentTextArea = null;
-	private Host config;
+	private Machine config;
 	private JPanel editPanel;
 	private JPanel buttonPanel;
 	private JButton applyButton;
@@ -51,7 +51,7 @@ public class EditHostPanel extends JPanel {
 		initialize();
 	}
 	
-	public EditHostPanel(Host config) {
+	public EditHostPanel(Machine config) {
 		super();
 		initialize();
 		setConfig(config);
@@ -251,7 +251,7 @@ public class EditHostPanel extends JPanel {
 	 * @return the currently used configuration
 	 * @see #updateConfig()
 	 */
-	public Host getConfig() {
+	public Machine getConfig() {
 		return config;
 	}
 	
@@ -260,7 +260,7 @@ public class EditHostPanel extends JPanel {
 	 * 
 	 * @param config the configuration
 	 */	
-	public synchronized void setConfig(Host config) {
+	public synchronized void setConfig(Machine config) {
 		if (hasChanges()) {
 			if (JOptionPane.showConfirmDialog(this, Messages.ERROR_MESSAGES.getFormattedString("host.unsavedChanges.message", this.config.getName()), Messages.ERROR_MESSAGES.getString("host.unsavedChanges.title"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
 				applyChanges();
@@ -277,7 +277,7 @@ public class EditHostPanel extends JPanel {
 	 * 
 	 * @return the updated configuration. Null if there is no current configuration.
 	 */
-	public synchronized Host applyChanges() {
+	public synchronized Machine applyChanges() {
 		if (null != config) {
 			int port = -1;
 			
@@ -416,7 +416,7 @@ public class EditHostPanel extends JPanel {
 	}
 
 	private void updateFromConfig() {
-		Host currentConfig = getConfig();
+		Machine currentConfig = getConfig();
 		boolean enabled = (null != currentConfig);
 
 		if (enabled) {
@@ -533,6 +533,9 @@ public class EditHostPanel extends JPanel {
 
 /*
  * $Log: EditHostPanel.java,v $
+ * Revision 1.8  2004/04/21 20:41:21  gon23
+ * javadoc
+ *
  * Revision 1.7  2004/04/16 12:27:11  gon23
  * *** empty log message ***
  *
