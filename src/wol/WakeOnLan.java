@@ -1,5 +1,5 @@
 /*
- * $Id: WakeOnLan.java,v 1.10 2004/04/28 05:39:15 gon23 Exp $
+ * $Id: WakeOnLan.java,v 1.11 2004/05/17 21:58:59 gon23 Exp $
  */
 package wol;
 
@@ -88,19 +88,19 @@ public class WakeOnLan {
 		
 		for (int i = 0; i < hosts.length; i++) {
 			Machine hostConfig = hosts[i];
-			hostMap.put(hostConfig.getName(), hostConfig);
+			hostMap.put(hostConfig.getName().toLowerCase(), hostConfig);
 		}
 		
 		for (int i = 0; i < names.length; i++) {
 			String name = names[i];
-			Machine hostConfig = (Machine) hostMap.get(name);
-				if (null != host) {
+			Machine hostConfig = (Machine) hostMap.get(name.toLowerCase());
+				if (null != hostConfig) {
 					wakeupConfig(hostConfig);
 				} else {
 					try {
 						wakeupEthernetAddresses(name, host, port);
 					} catch (IllegalEthernetAddressException e) {
-						Messages.ERROR_MESSAGES.getFormattedString("wakeup.notAHostOrEthernetAddress", name);
+						LOG.warning(Messages.ERROR_MESSAGES.getFormattedString("wakeup.notAHostOrEthernetAddress", name));
 					}
 				}
 		}
@@ -262,6 +262,9 @@ public class WakeOnLan {
 
 /*
  * $Log: WakeOnLan.java,v $
+ * Revision 1.11  2004/05/17 21:58:59  gon23
+ * javadoc
+ *
  * Revision 1.10  2004/04/28 05:39:15  gon23
  * *** empty log message ***
  *

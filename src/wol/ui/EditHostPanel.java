@@ -1,5 +1,5 @@
 /*
- * $Id: EditHostPanel.java,v 1.9 2004/04/28 05:38:35 gon23 Exp $
+ * $Id: EditHostPanel.java,v 1.10 2004/05/17 21:58:59 gon23 Exp $
  */
 package wol.ui;
 
@@ -45,15 +45,18 @@ public class EditHostPanel extends JPanel {
 	private JPanel buttonPanel;
 	private JButton applyButton;
 	private JButton revertButton;
+	private MachineValidator validator;
 
-	public EditHostPanel() {
+	public EditHostPanel(MachineValidator validator) {
 		super();
 		initialize();
+		this.validator = validator;
 	}
 	
-	public EditHostPanel(Machine config) {
+	public EditHostPanel(Machine config, MachineValidator validator) {
 		super();
 		initialize();
+		this.validator = validator;
 		setConfig(config);
 	}
 	
@@ -494,12 +497,32 @@ public class EditHostPanel extends JPanel {
 	}
 	
 	private void checkButtonStates() {
-		boolean changed = hasChanges();
+		boolean changed = hasChanges() && isConfigValid();
 		
 		getApplyButton().setEnabled(changed);
 		getRevertButton().setEnabled(changed);
 	}
 	
+	public boolean isConfigValid() {
+		if (!validator.nameIsValid(getNameTextField().getText())) {
+			return false;
+		}
+		
+		if (!validator.commentIsValid(getCommentTextArea().getText())) {
+			return false;
+		}
+		
+		if (!validator.portIsValid(getPortTextField().getText())) {
+			return false;
+		}
+		
+		if (!validator.ethernetAddressIsValid(getEthernetAddressTextField().getText())) {
+			return false;
+		}
+		
+		return true;
+	}
+
 	public boolean hasChanges() {
 		if (null == config) {
 			return false;
@@ -539,6 +562,9 @@ public class EditHostPanel extends JPanel {
 
 /*
  * $Log: EditHostPanel.java,v $
+ * Revision 1.10  2004/05/17 21:58:59  gon23
+ * javadoc
+ *
  * Revision 1.9  2004/04/28 05:38:35  gon23
  * Added Statusbar
  *

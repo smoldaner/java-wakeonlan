@@ -1,5 +1,5 @@
 /*
- * $Id: MainPanel.java,v 1.12 2004/04/28 05:38:35 gon23 Exp $
+ * $Id: MainPanel.java,v 1.13 2004/05/17 21:58:59 gon23 Exp $
  */
 package wol.ui;
 
@@ -72,6 +72,63 @@ public class MainPanel extends JPanel {
 	private JMenuItem exitMenuItem;
 	private JPanel configurationsButtonPanel;
 	private boolean inWakeup = false;
+	private MachineValidator validator = new MachineValidator() {
+		
+		public boolean nameIsValid(String name) {
+			Machine editConfig = getEditHostPanel().getConfig();
+			Machine[] machines = config.getMachines();
+			
+			for (int i = 0; i < machines.length; i++) {
+				Machine machine = machines[i];
+				
+				if (machine != editConfig) {
+					if (machine.getName().equalsIgnoreCase(name)) {
+						getStatusBar().setStatusText("Name already exists");
+						return false;
+					}
+				}
+			} 
+			
+			return true;
+		}
+
+		public boolean portIsValid(String portString) {
+			int port = -1;
+			
+			try {
+				port = Integer.parseInt(portString);
+			} catch (Exception e) {
+				return false;
+			}
+			
+			return (port >= 0 && port <= 0xFFFF);
+		}
+
+		public boolean hostIsValid(String host) {
+			try {
+				InetAddress.getByName(host);
+			} catch (Exception e) {
+				return false;
+			}
+			
+			return true;
+		}
+
+		public boolean ethernetAddressIsValid(String ethernetAddressString) {
+			try {
+				new EthernetAddress(ethernetAddressString);
+			} catch (Exception e) {
+				return false;
+			}
+			
+			return true;
+			
+		}
+
+		public boolean commentIsValid(String comment) {
+			return true;
+		}
+	};
 
 	public MainPanel() {
 		super();
@@ -491,7 +548,7 @@ public class MainPanel extends JPanel {
 	
 	private EditHostPanel getEditHostPanel() {
 		if (null == editHostPanel) {
-			editHostPanel = new EditHostPanel();
+			editHostPanel = new EditHostPanel(validator);
 			editHostPanel.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 0));
 		}
 		
@@ -742,6 +799,9 @@ public class MainPanel extends JPanel {
 
 /*
  * $Log: MainPanel.java,v $
+ * Revision 1.13  2004/05/17 21:58:59  gon23
+ * javadoc
+ *
  * Revision 1.12  2004/04/28 05:38:35  gon23
  * Added Statusbar
  *
