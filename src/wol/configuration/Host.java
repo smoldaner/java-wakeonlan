@@ -1,5 +1,5 @@
 /*
- * $Id: Host.java,v 1.4 2004/04/15 22:57:44 gon23 Exp $
+ * $Id: Host.java,v 1.5 2004/04/16 12:27:11 gon23 Exp $
  */
 package wol.configuration;
 
@@ -65,6 +65,10 @@ public class Host {
 	}
 
 	public void setPort(int port) {
+		if (port < 0 || port > 0xFFFF) {
+			throw new IllegalArgumentException("Port value out of range: " + port);
+		}
+		
 		int oldValue = this.port;
 		
 		this.port = port;
@@ -168,6 +172,9 @@ public class Host {
 
 /*
  * $Log: Host.java,v $
+ * Revision 1.5  2004/04/16 12:27:11  gon23
+ * *** empty log message ***
+ *
  * Revision 1.4  2004/04/15 22:57:44  gon23
  * *** empty log message ***
  *

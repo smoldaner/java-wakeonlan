@@ -1,5 +1,5 @@
 /*
- * $Id: EditHostPanel.java,v 1.6 2004/04/15 22:57:57 gon23 Exp $
+ * $Id: EditHostPanel.java,v 1.7 2004/04/16 12:27:11 gon23 Exp $
  */
 package wol.ui;
 
@@ -10,14 +10,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.text.ParseException;
 
 import javax.swing.InputVerifier;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.text.MaskFormatter;
 
 import wol.configuration.*;
 import wol.resources.Messages;
@@ -33,7 +36,7 @@ public class EditHostPanel extends JPanel {
 	private javax.swing.JLabel portLabel = null;
 	private JTextField portTextField = null;
 	private javax.swing.JLabel ethernetAddressLabel = null;
-	private javax.swing.JTextField ethernetAddressTextField = null;
+	private JFormattedTextField ethernetAddressTextField = null;
 	private javax.swing.JLabel commentLabel = null;
 	private javax.swing.JScrollPane commentScrollPane = null;
 	private javax.swing.JTextArea commentTextArea = null;
@@ -285,7 +288,7 @@ public class EditHostPanel extends JPanel {
 			
 			config.setPort(port);
 			config.setHost(getHostTextField().getText());
-			config.setEthernetAddress(getEthernetAddressTextField().getText());
+			config.setEthernetAddress((String) getEthernetAddressTextField().getValue());
 			config.setName(getNameTextField().getText());
 			config.setComment(getCommentTextArea().getText());
 			
@@ -381,9 +384,20 @@ public class EditHostPanel extends JPanel {
 		return ethernetAddressLabel;
 	}
 
-	private javax.swing.JTextField getEthernetAddressTextField() {
+	private JFormattedTextField getEthernetAddressTextField() {
 		if (ethernetAddressTextField == null) {
-			ethernetAddressTextField = new javax.swing.JTextField();
+			MaskFormatter formatter;
+			
+			try {
+				formatter = new MaskFormatter("HH:HH:HH:HH:HH:HH");
+			} catch (ParseException e) {
+				//Should not happen, this is a valid mask!
+				throw new RuntimeException("Should not happen", e);
+			}
+			
+			formatter.setCommitsOnValidEdit(true);
+			formatter.setPlaceholderCharacter('_');
+			ethernetAddressTextField = new JFormattedTextField(formatter);
 			ethernetAddressTextField.setToolTipText(Messages.UI_MESSAGES.getString("ethernetAddress.tooltip"));
 			ethernetAddressTextField.addKeyListener(new KeyAdapter() {
 				public void keyTyped(KeyEvent e) {
@@ -409,13 +423,13 @@ public class EditHostPanel extends JPanel {
 			getHostTextField().setText(currentConfig.getHost());
 			getNameTextField().setText(currentConfig.getName());
 			getPortTextField().setText(currentConfig.getPort() > 0 ? String.valueOf(currentConfig.getPort()) : null);
-			getEthernetAddressTextField().setText(currentConfig.getEthernetAddress());
+			getEthernetAddressTextField().setValue(currentConfig.getEthernetAddress());
 			getCommentTextArea().setText(currentConfig.getComment());
 		} else {
 			getHostTextField().setText(null);
 			getNameTextField().setText(null);
 			getPortTextField().setText(null);
-			getEthernetAddressTextField().setText(null);
+			getEthernetAddressTextField().setValue(null);
 			getCommentTextArea().setText(null);
 		}
 
@@ -481,6 +495,10 @@ public class EditHostPanel extends JPanel {
 			return false;
 		}
 		
+		if (!getEthernetAddressTextField().isEditValid()) {
+			return false;
+		}
+		
 		if (!getNameTextField().getText().equals(config.getName())) {
 			return true;
 		}
@@ -489,7 +507,7 @@ public class EditHostPanel extends JPanel {
 			return true;
 		}
 		
-		if (!getEthernetAddressTextField().getText().equals(config.getEthernetAddress())) {
+		if (!getEthernetAddressTextField().getValue().equals(config.getEthernetAddress())) {
 			return true;
 		}
 		
@@ -515,6 +533,9 @@ public class EditHostPanel extends JPanel {
 
 /*
  * $Log: EditHostPanel.java,v $
+ * Revision 1.7  2004/04/16 12:27:11  gon23
+ * *** empty log message ***
+ *
  * Revision 1.6  2004/04/15 22:57:57  gon23
  * *** empty log message ***
  *

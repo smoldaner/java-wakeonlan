@@ -1,5 +1,5 @@
 /*
- * $Id: MainPanel.java,v 1.7 2004/04/15 10:21:36 gon23 Exp $
+ * $Id: MainPanel.java,v 1.8 2004/04/16 12:27:11 gon23 Exp $
  */
 package wol.ui;
 
@@ -13,6 +13,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,6 +34,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import wol.EthernetAddress;
+import wol.IllegalEthernetAddressException;
+import wol.WakeUpUtil;
 import wol.configuration.*;
 import wol.resources.Messages;
 
@@ -322,13 +328,55 @@ public class MainPanel extends JPanel {
 			wakeupButton.setToolTipText(Messages.UI_MESSAGES.getString("button.wakeup.tooltip"));
 			wakeupButton.addActionListener(new java.awt.event.ActionListener() { 
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					getEditHostPanel().applyChanges();
-					System.out.println("actionPerformed()"); // TODO Auto-generated Event stub actionPerformed()
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							getEditHostPanel().applyChanges();
+							wakeup();
+						}
+					});
 				}
 			});
 			wakeupButton.setEnabled(false);
 		}
 		return wakeupButton;
+	}
+
+	protected void wakeup() {
+		Object[] hosts = getConfigurationsList().getSelectedValues();
+		
+		for (int i = 0; i < hosts.length; i++) {
+			Host hostConfig = (Host) hosts[i];
+
+			try {
+				EthernetAddress nic = new EthernetAddress(hostConfig.getEthernetAddress());
+				InetAddress host = InetAddress.getByName(hostConfig.getHost());
+				int port = hostConfig.getPort();
+				
+				WakeUpUtil.wakeup(nic, host, port);
+			} catch (UnknownHostException e) {
+				String errMsg = Messages.ERROR_MESSAGES.getFormattedString("wakeup.unknownHost.message", hostConfig.getName(), hostConfig.getHost());
+				
+				LOG.log(Level.WARNING, errMsg, e);
+				JOptionPane.showMessageDialog(this, errMsg,
+					Messages.ERROR_MESSAGES.getString("wakeup.unknowHost.title"),
+						JOptionPane.ERROR_MESSAGE);
+			} catch (IllegalEthernetAddressException e) {
+				String errMsg = Messages.ERROR_MESSAGES.getFormattedString("wakeup.invalidEthernetAddress.message", hostConfig.getName(), hostConfig.getEthernetAddress()); 
+				
+				LOG.log(Level.WARNING, errMsg, e);
+				JOptionPane.showMessageDialog(this, errMsg, 
+						Messages.ERROR_MESSAGES.getString("wakeup.invalidEthernetAddress.title"),
+						JOptionPane.ERROR_MESSAGE);
+			} catch (IOException e) {
+				String errMsg = Messages.ERROR_MESSAGES.getFormattedString("wakeup.io.message", hostConfig.getName());
+				
+				LOG.log(Level.WARNING, errMsg, e);
+				JOptionPane.showMessageDialog(this, errMsg,
+						Messages.ERROR_MESSAGES
+								.getString("wakeup.io.title"),
+						JOptionPane.ERROR_MESSAGE);
+			}
+		}
 	}
 
 	private javax.swing.JPanel getCenterPanel() {
@@ -606,6 +654,9 @@ public class MainPanel extends JPanel {
 
 /*
  * $Log: MainPanel.java,v $
+ * Revision 1.8  2004/04/16 12:27:11  gon23
+ * *** empty log message ***
+ *
  * Revision 1.7  2004/04/15 10:21:36  gon23
  * New Resources handling
  *
