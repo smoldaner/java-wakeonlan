@@ -1,0 +1,95 @@
+<!-- $Id: build.xml,v 1.1 2003/09/01 07:10:41 gon23 Exp $ -->
+<project name="wakeonlan" default="all" basedir=".">
+	<property file="build.properties"/>
+	
+	<path id="build.classpath">
+		<fileset dir="${lib.dir}">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+	
+	
+	
+	<target name="init.build">
+		<mkdir dir="${build.classes.dir}"/>
+	</target>
+	
+	<target name="init.deploy">
+		<mkdir dir="${deploy.dir}"/>
+		<mkdir dir="${deploy.lib.dir}"/>
+		<mkdir dir="${deploy.doc.dir}"/>
+	</target>
+	
+	<target name="build" depends="init.build">
+		<javac srcdir="${src.dir}" 
+			destdir="${build.classes.dir}" 
+			debug="${build.debug}" 
+			optimize="${build.optimize}" 
+			target="${build.target}" 
+			classpathref="build.classpath" />
+		<copy todir="${build.classes.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**/*.properties"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="init.javadoc">
+		<mkdir dir="${deploy.javadoc.dir}"/>
+	</target>
+	
+	<target name="javadoc" depends="init.javadoc">
+		<javadoc 
+			destdir="${deploy.javadoc.dir}" 
+			packagenames="wol.*"
+			sourcepath="${src.dir}"
+			windowtitle="wakeonlan - API"
+			author="true">
+			<doctitle><![CDATA[<h1>wakeonlan</h1>]]></doctitle>
+			<link href="http://java.sun.com/j2se/1.4.2/docs/api/"/>
+		</javadoc>
+	</target>
+	
+	<target name="deploy" depends="build,init.deploy">
+		<jar basedir="${build.classes.dir}" 
+			destfile="${deploy.dir}/${ant.project.name}.jar" 
+			manifest="${build.manifest}" />
+		<copy todir="${deploy.lib.dir}">
+			<fileset dir="${lib.dir}" />
+		</copy>
+		<copy todir="${deploy.doc.dir}" >
+			<fileset dir="${doc.dir}" />
+		</copy>
+	</target>
+	
+	<target name="deploy-onefile" depends="build,init.deploy">
+		<classfileset id="classes" dir="${build.classes.dir}">
+			<rootfileset dir="${build.classes.dir}" includes="wol/WakeOnLan.class"/>
+		</classfileset>
+		<jar destfile="${deploy.dir}/${ant.project.name}.jar" 
+			manifest="${build.manifest}">
+			<fileset refid="classes" />	
+		</jar>
+		
+		<copy todir="${deploy.lib.dir}">
+			<fileset dir="${lib.dir}" />
+		</copy>
+		<copy todir="${deploy.doc.dir}" >
+			<fileset dir="${doc.dir}" />
+		</copy>
+	</target>
+
+	<target name="clean">
+		<delete quiet="true">
+			<fileset dir="${deploy.dir}" />
+			<fileset dir="${build.dir}" />
+		</delete>
+	</target>
+	
+	<target name="all">
+		<echo message="Cleaning project" />
+		<antcall target="clean" />
+		<echo message="Deploy wakeonlan" />
+		<antcall target="deploy" />
+	</target>
+</project>
