@@ -1,7 +1,7 @@
 /*
- * $Id: IllegalEthernetAddressException.java,v 1.1 2004/04/15 22:57:57 gon23 Exp $
+ * $Id: IllegalEthernetAddressException.java,v 1.1 2004/04/27 19:08:15 gon23 Exp $
  */
-package wol;
+package wol.configuration;
 
 /**
  * Thrown to indicate that a ethernet address could not be created.
@@ -22,6 +22,9 @@ public class IllegalEthernetAddressException extends Exception {
 
 /*
  * $Log: IllegalEthernetAddressException.java,v $
+ * Revision 1.1  2004/04/27 19:08:15  gon23
+ * moved to wol.configuration
+ *
  * Revision 1.1  2004/04/15 22:57:57  gon23
  * *** empty log message ***
  *

@@ -1,5 +1,5 @@
 /*
- * $Id: MainPanel.java,v 1.10 2004/04/21 22:44:12 gon23 Exp $
+ * $Id: MainPanel.java,v 1.11 2004/04/27 19:08:16 gon23 Exp $
  */
 package wol.ui;
 
@@ -34,8 +34,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import wol.EthernetAddress;
-import wol.IllegalEthernetAddressException;
 import wol.WakeUpUtil;
 import wol.configuration.*;
 import wol.resources.Messages;
@@ -691,6 +689,9 @@ public class MainPanel extends JPanel {
 
 /*
  * $Log: MainPanel.java,v $
+ * Revision 1.11  2004/04/27 19:08:16  gon23
+ * moved to wol.configuration
+ *
  * Revision 1.10  2004/04/21 22:44:12  gon23
  * *** empty log message ***
  *

@@ -1,5 +1,5 @@
 /*
- * $Id: WakeUpUtil.java,v 1.5 2004/04/16 09:26:16 gon23 Exp $
+ * $Id: WakeUpUtil.java,v 1.6 2004/04/27 19:08:16 gon23 Exp $
  */
 package wol;
 
@@ -9,6 +9,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+
+import wol.configuration.*;
 
 /**
  * A class to wake up wake-on-lan enabled machines.
@@ -135,6 +137,9 @@ public class WakeUpUtil {
 
 /*
  * $Log: WakeUpUtil.java,v $
+ * Revision 1.6  2004/04/27 19:08:16  gon23
+ * moved to wol.configuration
+ *
  * Revision 1.5  2004/04/16 09:26:16  gon23
  * extracted  createWakeupFrame
  *

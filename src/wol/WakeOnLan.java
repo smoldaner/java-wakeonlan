@@ -1,5 +1,5 @@
 /*
- * $Id: WakeOnLan.java,v 1.8 2004/04/21 22:44:07 gon23 Exp $
+ * $Id: WakeOnLan.java,v 1.9 2004/04/27 19:08:16 gon23 Exp $
  */
 package wol;
 
@@ -26,6 +26,7 @@ import com.martiansoftware.jsap.stringparsers.InetAddressStringParser;
 import com.martiansoftware.jsap.stringparsers.IntegerStringParser;
 import com.martiansoftware.jsap.stringparsers.StringStringParser;
 
+import wol.configuration.*;
 import wol.configuration.Configuration;
 import wol.configuration.Machine;
 import wol.resources.Messages;
@@ -282,6 +283,9 @@ public class WakeOnLan {
 
 /*
  * $Log: WakeOnLan.java,v $
+ * Revision 1.9  2004/04/27 19:08:16  gon23
+ * moved to wol.configuration
+ *
  * Revision 1.8  2004/04/21 22:44:07  gon23
  * *** empty log message ***
  *

@@ -1,11 +1,12 @@
 /*
- * $Id: EthernetAddress.java,v 1.3 2004/04/16 12:27:11 gon23 Exp $
+ * $Id: EthernetAddress.java,v 1.1 2004/04/27 19:08:15 gon23 Exp $
  */
-package wol;
+package wol.configuration;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.StringTokenizer;
+
 
 /**
  * This class represents a ethernet address.
@@ -160,6 +161,9 @@ public class EthernetAddress implements Serializable, Cloneable{
 
 /*
  * $Log: EthernetAddress.java,v $
+ * Revision 1.1  2004/04/27 19:08:15  gon23
+ * moved to wol.configuration
+ *
  * Revision 1.3  2004/04/16 12:27:11  gon23
  * *** empty log message ***
  *
