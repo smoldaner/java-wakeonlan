@@ -1,5 +1,5 @@
 /*
- * $Id: EditHostPanel.java,v 1.4 2004/04/14 22:14:49 gon23 Exp $
+ * $Id: EditHostPanel.java,v 1.5 2004/04/15 10:21:36 gon23 Exp $
  */
 package wol.ui;
 
@@ -19,8 +19,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-import wol.Errors;
 import wol.configuration.*;
+import wol.resources.Messages;
 
 /**
  * @author <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#115;&#46;&#109;&#111;&#108;&#100;&#97;&#110;&#101;&#114;&#64;&#103;&#109;&#120;&#46;&#110;&#101;&#116;">Steffen Moldaner</a>
@@ -74,8 +74,8 @@ public class EditHostPanel extends JPanel {
 	private JButton getRevertButton() {
 		if (null == revertButton) {
 			revertButton = new JButton();
-			revertButton.setText(Messages.getString("button.revert.label"));
-			revertButton.setToolTipText(Messages.getString("button.revert.tooltip"));
+			revertButton.setText(Messages.UI_MESSAGES.getString("button.revert.label"));
+			revertButton.setToolTipText(Messages.UI_MESSAGES.getString("button.revert.tooltip"));
 			revertButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					SwingUtilities.invokeLater(new Runnable() {
@@ -93,8 +93,8 @@ public class EditHostPanel extends JPanel {
 	private JButton getApplyButton() {
 		if (null == applyButton) {
 			applyButton = new JButton();
-			applyButton.setText(Messages.getString("button.apply.label"));
-			applyButton.setToolTipText(Messages.getString("button.apply.tooltip"));
+			applyButton.setText(Messages.UI_MESSAGES.getString("button.apply.label"));
+			applyButton.setToolTipText(Messages.UI_MESSAGES.getString("button.apply.tooltip"));
 			applyButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					SwingUtilities.invokeLater(new Runnable() {
@@ -214,7 +214,7 @@ public class EditHostPanel extends JPanel {
 	private javax.swing.JLabel getNameLabel() {
 		if (nameLabel == null) {
 			nameLabel = new javax.swing.JLabel();
-			nameLabel.setText(Messages.getString("name.label")); //$NON-NLS-1$
+			nameLabel.setText(Messages.UI_MESSAGES.getString("name.label")); //$NON-NLS-1$
 			nameLabel.setLabelFor(getNameTextField());
 		}
 		return nameLabel;
@@ -223,7 +223,7 @@ public class EditHostPanel extends JPanel {
 	private javax.swing.JTextField getNameTextField() {
 		if (nameTextField == null) {
 			nameTextField = new javax.swing.JTextField();
-			nameTextField.setToolTipText(Messages.getString("name.tooltip"));
+			nameTextField.setToolTipText(Messages.UI_MESSAGES.getString("name.tooltip"));
 			nameTextField.setColumns(20);
 			nameTextField.setEnabled(false);
 			nameTextField.addKeyListener(new KeyAdapter() {
@@ -259,7 +259,7 @@ public class EditHostPanel extends JPanel {
 	 */	
 	public synchronized void setConfig(Host config) {
 		if (hasChanges()) {
-			if (JOptionPane.showConfirmDialog(this, Errors.getFormattedString("host.unsavedChanges.message", this.config.getName()), Errors.getString("host.unsavedChanges.title"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+			if (JOptionPane.showConfirmDialog(this, Messages.ERROR_MESSAGES.getFormattedString("host.unsavedChanges.message", this.config.getName()), Messages.ERROR_MESSAGES.getString("host.unsavedChanges.title"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
 				applyChanges();
 			}
 		}
@@ -298,7 +298,7 @@ public class EditHostPanel extends JPanel {
 	private javax.swing.JLabel getHostLabel() {
 		if (hostLabel == null) {
 			hostLabel = new javax.swing.JLabel();
-			hostLabel.setText(Messages.getString("host.label")); //$NON-NLS-1$
+			hostLabel.setText(Messages.UI_MESSAGES.getString("host.label")); //$NON-NLS-1$
 			hostLabel.setLabelFor(getHostTextField());
 		}
 		return hostLabel;
@@ -307,7 +307,7 @@ public class EditHostPanel extends JPanel {
 	private javax.swing.JTextField getHostTextField() {
 		if (hostTextField == null) {
 			hostTextField = new javax.swing.JTextField();
-			hostTextField.setToolTipText(Messages.getString("host.tooltip"));
+			hostTextField.setToolTipText(Messages.UI_MESSAGES.getString("host.tooltip"));
 			hostTextField.addKeyListener(new KeyAdapter() {
 				public void keyTyped(KeyEvent e) {
 					SwingUtilities.invokeLater(new Runnable() {
@@ -327,7 +327,7 @@ public class EditHostPanel extends JPanel {
 	private javax.swing.JLabel getPortLabel() {
 		if (portLabel == null) {
 			portLabel = new javax.swing.JLabel();
-			portLabel.setText(Messages.getString("port.label")); //$NON-NLS-1$
+			portLabel.setText(Messages.UI_MESSAGES.getString("port.label")); //$NON-NLS-1$
 			portLabel.setLabelFor(getPortTextField());
 		}
 		return portLabel;
@@ -338,7 +338,7 @@ public class EditHostPanel extends JPanel {
 			portTextField = new JTextField();
 			portTextField.setColumns(4);
 			portTextField.setHorizontalAlignment(JTextField.RIGHT);
-			portTextField.setToolTipText(Messages.getString("port.tooltip"));
+			portTextField.setToolTipText(Messages.UI_MESSAGES.getString("port.tooltip"));
 			portTextField.setInputVerifier(new InputVerifier() {
 				public boolean verify(JComponent input) {
 					String valueString = ((JTextField) input).getText();
@@ -375,7 +375,7 @@ public class EditHostPanel extends JPanel {
 	private javax.swing.JLabel getHwAdressLabel() {
 		if (hwAdressLabel == null) {
 			hwAdressLabel = new javax.swing.JLabel();
-			hwAdressLabel.setText(Messages.getString("hwAdress.label")); //$NON-NLS-1$
+			hwAdressLabel.setText(Messages.UI_MESSAGES.getString("hwAdress.label")); //$NON-NLS-1$
 			hwAdressLabel.setLabelFor(getHwAdressTextField());
 		}
 		return hwAdressLabel;
@@ -384,7 +384,7 @@ public class EditHostPanel extends JPanel {
 	private javax.swing.JTextField getHwAdressTextField() {
 		if (hwAdressTextField == null) {
 			hwAdressTextField = new javax.swing.JTextField();
-			hwAdressTextField.setToolTipText(Messages.getString("hwAdress.tooltip"));
+			hwAdressTextField.setToolTipText(Messages.UI_MESSAGES.getString("hwAdress.tooltip"));
 			hwAdressTextField.addKeyListener(new KeyAdapter() {
 				public void keyTyped(KeyEvent e) {
 					SwingUtilities.invokeLater(new Runnable() {
@@ -431,7 +431,7 @@ public class EditHostPanel extends JPanel {
 	private javax.swing.JLabel getCommentLabel() {
 		if (commentLabel == null) {
 			commentLabel = new javax.swing.JLabel();
-			commentLabel.setText(Messages.getString("comment.label")); //$NON-NLS-1$
+			commentLabel.setText(Messages.UI_MESSAGES.getString("comment.label")); //$NON-NLS-1$
 			commentLabel.setLabelFor(getCommentTextArea());
 		}
 		return commentLabel;
@@ -451,7 +451,7 @@ public class EditHostPanel extends JPanel {
 			commentTextArea.setRows(15);
 			commentTextArea.setWrapStyleWord(true);
 			commentTextArea.setLineWrap(true);
-			commentTextArea.setToolTipText(Messages.getString("comment.tooltip"));
+			commentTextArea.setToolTipText(Messages.UI_MESSAGES.getString("comment.tooltip"));
 			commentTextArea.addKeyListener(new KeyAdapter() {
 				public void keyTyped(KeyEvent e) {
 					SwingUtilities.invokeLater(new Runnable() {
@@ -515,6 +515,9 @@ public class EditHostPanel extends JPanel {
 
 /*
  * $Log: EditHostPanel.java,v $
+ * Revision 1.5  2004/04/15 10:21:36  gon23
+ * New Resources handling
+ *
  * Revision 1.4  2004/04/14 22:14:49  gon23
  * *** empty log message ***
  *

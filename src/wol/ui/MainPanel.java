@@ -1,5 +1,5 @@
 /*
- * $Id: MainPanel.java,v 1.6 2004/04/14 22:14:49 gon23 Exp $
+ * $Id: MainPanel.java,v 1.7 2004/04/15 10:21:36 gon23 Exp $
  */
 package wol.ui;
 
@@ -31,8 +31,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import wol.Errors;
 import wol.configuration.*;
+import wol.resources.Messages;
 
 /**
  * @author <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#115;&#46;&#109;&#111;&#108;&#100;&#97;&#110;&#101;&#114;&#64;&#103;&#109;&#120;&#46;&#110;&#101;&#116;">Steffen Moldaner</a>
@@ -67,7 +67,7 @@ public class MainPanel extends JPanel {
 	public MainPanel() {
 		super();
 		ArrayList list = new ArrayList();
-		Host currentConfig = new Host(Messages.getString("defaultConfigurationName"));
+		Host currentConfig = new Host(Messages.UI_MESSAGES.getString("defaultConfigurationName"));
 		
 		list.add(currentConfig);
 		this.configurationsModel = new HostsModel(new Host[0]);
@@ -86,7 +86,7 @@ public class MainPanel extends JPanel {
 			saveConfig();
 		} catch (FileNotFoundException e1) {
 			LOG.log(Level.SEVERE, "Can't write config", e1);
-			JOptionPane.showMessageDialog(this, Errors.getString("save.fileNotFound.message"), Errors.getString("save.fileNotFound.title"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, Messages.ERROR_MESSAGES.getString("save.fileNotFound.message"), Messages.ERROR_MESSAGES.getString("save.fileNotFound.title"), JOptionPane.ERROR_MESSAGE);
 		}
 		
 		this.config = config;
@@ -112,8 +112,8 @@ public class MainPanel extends JPanel {
 	
 	private JMenu getFileMenu() {
 		if (null == fileMenu) {
-			fileMenu = new JMenu(Messages.getString("menu.file.label"));
-			fileMenu.setMnemonic(Messages.getMnemonic("menu.file.mnemonic"));
+			fileMenu = new JMenu(Messages.UI_MESSAGES.getString("menu.file.label"));
+			fileMenu.setMnemonic(Messages.UI_MESSAGES.getChar("menu.file.mnemonic"));
 			fileMenu.add(getNewMenu());
 			fileMenu.addSeparator();
 			fileMenu.add(getOpenMenuItem());
@@ -129,8 +129,8 @@ public class MainPanel extends JPanel {
 	
 	private JMenuItem getOpenMenuItem() {
 		if (null == openMenuItem) {
-			openMenuItem = new JMenuItem(Messages.getString("menu.file.open.label"));
-			openMenuItem.setMnemonic(Messages.getMnemonic("menu.file.open.mnemonic"));
+			openMenuItem = new JMenuItem(Messages.UI_MESSAGES.getString("menu.file.open.label"));
+			openMenuItem.setMnemonic(Messages.UI_MESSAGES.getChar("menu.file.open.mnemonic"));
 			openMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					JFileChooser fileChooser = new JFileChooser(config.getFile());
@@ -151,8 +151,8 @@ public class MainPanel extends JPanel {
 	
 	private JMenuItem getSaveMenuItem() {
 		if (null == saveMenuItem) {
-			saveMenuItem = new JMenuItem(Messages.getString("menu.file.save.label"));
-			saveMenuItem.setMnemonic(Messages.getMnemonic("menu.file.save.mnemonic"));
+			saveMenuItem = new JMenuItem(Messages.UI_MESSAGES.getString("menu.file.save.label"));
+			saveMenuItem.setMnemonic(Messages.UI_MESSAGES.getChar("menu.file.save.mnemonic"));
 			saveMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					SwingUtilities.invokeLater(new Runnable() {
@@ -163,7 +163,7 @@ public class MainPanel extends JPanel {
 								saveConfig();
 							} catch (FileNotFoundException e1) {
 								LOG.log(Level.SEVERE, "Can't write config", e1);
-								JOptionPane.showMessageDialog(MainPanel.this, Errors.getString("save.fileNotFound.message"), Errors.getString("save.fileNotFound.title"), JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(MainPanel.this, Messages.ERROR_MESSAGES.getString("save.fileNotFound.message"), Messages.ERROR_MESSAGES.getString("save.fileNotFound.title"), JOptionPane.ERROR_MESSAGE);
 							}
 						}
 					});
@@ -191,8 +191,8 @@ public class MainPanel extends JPanel {
 	
 	private JMenuItem getSaveAsMenuItem() {
 		if (null == saveAsMenuItem) {
-			saveAsMenuItem = new JMenuItem(Messages.getString("menu.file.saveAs.label"));
-			saveAsMenuItem.setMnemonic(Messages.getMnemonic("menu.file.saveAs.mnemonic"));
+			saveAsMenuItem = new JMenuItem(Messages.UI_MESSAGES.getString("menu.file.saveAs.label"));
+			saveAsMenuItem.setMnemonic(Messages.UI_MESSAGES.getChar("menu.file.saveAs.mnemonic"));
 			saveAsMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					JFileChooser fileChooser = new JFileChooser(config.getFile());
@@ -204,8 +204,8 @@ public class MainPanel extends JPanel {
 						
 						if (file.exists()) {
 							if (JOptionPane.showConfirmDialog(MainPanel.this, 
-								Errors.getFormattedString("save.fileExists.message", file.getAbsoluteFile()), 
-								Errors.getFormattedString("save.fileExists.title", file.getAbsoluteFile()), JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION){
+								Messages.ERROR_MESSAGES.getFormattedString("save.fileExists.message", file.getAbsoluteFile()), 
+								Messages.ERROR_MESSAGES.getFormattedString("save.fileExists.title", file.getAbsoluteFile()), JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION){
 									return;
 							}
 						}
@@ -217,8 +217,8 @@ public class MainPanel extends JPanel {
 							JOptionPane
 									.showMessageDialog(
 											MainPanel.this,
-											Errors.getString("save.fileNotFound.message"),
-											Errors.getString("save.fileNotFound.title"),
+											Messages.ERROR_MESSAGES.getString("save.fileNotFound.message"),
+											Messages.ERROR_MESSAGES.getString("save.fileNotFound.title"),
 											JOptionPane.ERROR_MESSAGE);
 						}
 						
@@ -232,8 +232,8 @@ public class MainPanel extends JPanel {
 	
 	private JMenu getNewMenu() {
 		if (null == newMenu) {
-			newMenu = new JMenu(Messages.getString("menu.file.new.label"));
-			newMenu.setMnemonic(Messages.getMnemonic("menu.file.new.mnemonic"));
+			newMenu = new JMenu(Messages.UI_MESSAGES.getString("menu.file.new.label"));
+			newMenu.setMnemonic(Messages.UI_MESSAGES.getChar("menu.file.new.mnemonic"));
 			newMenu.add(getNewConfigMenuItem());
 			newMenu.add(getNewHostMenuItem());
 			
@@ -244,8 +244,8 @@ public class MainPanel extends JPanel {
 	
 	private JMenuItem getNewConfigMenuItem() {
 		if (null == newConfigMenuItem) {
-			newConfigMenuItem = new JMenuItem(Messages.getString("menu.file.new.config.label"));
-			newConfigMenuItem.setMnemonic(Messages.getMnemonic("menu.file.new.config.mnemonic"));
+			newConfigMenuItem = new JMenuItem(Messages.UI_MESSAGES.getString("menu.file.new.config.label"));
+			newConfigMenuItem.setMnemonic(Messages.UI_MESSAGES.getChar("menu.file.new.config.mnemonic"));
 			newConfigMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					SwingUtilities.invokeLater(new Runnable() {
@@ -258,8 +258,8 @@ public class MainPanel extends JPanel {
 								
 								if (file.exists()) {
 									if (JOptionPane.showConfirmDialog(MainPanel.this, 
-										Errors.getFormattedString("save.fileExists.message", file.getAbsoluteFile()), 
-										Errors.getFormattedString("save.fileExists.title", file.getAbsoluteFile()), JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION){
+										Messages.ERROR_MESSAGES.getFormattedString("save.fileExists.message", file.getAbsoluteFile()), 
+										Messages.ERROR_MESSAGES.getFormattedString("save.fileExists.title", file.getAbsoluteFile()), JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION){
 											return;
 									}
 								}
@@ -277,8 +277,8 @@ public class MainPanel extends JPanel {
 	
 	private JMenuItem getNewHostMenuItem() {
 		if (null == newHostMenuItem) {
-			newHostMenuItem = new JMenuItem(Messages.getString("menu.file.new.host.label"));
-			newHostMenuItem.setMnemonic(Messages.getMnemonic("menu.file.new.host.mnemonic"));
+			newHostMenuItem = new JMenuItem(Messages.UI_MESSAGES.getString("menu.file.new.host.label"));
+			newHostMenuItem.setMnemonic(Messages.UI_MESSAGES.getChar("menu.file.new.host.mnemonic"));
 			newHostMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					SwingUtilities.invokeLater(new Runnable() {
@@ -295,8 +295,8 @@ public class MainPanel extends JPanel {
 	
 	private JMenuItem getExitMenuItem() {
 		if (null == exitMenuItem) {
-			exitMenuItem = new JMenuItem(Messages.getString("menu.file.exit.label"));
-			exitMenuItem.setMnemonic(Messages.getMnemonic("menu.file.exit.mnemonic"));
+			exitMenuItem = new JMenuItem(Messages.UI_MESSAGES.getString("menu.file.exit.label"));
+			exitMenuItem.setMnemonic(Messages.UI_MESSAGES.getChar("menu.file.exit.mnemonic"));
 		}
 		
 		return exitMenuItem;
@@ -318,8 +318,8 @@ public class MainPanel extends JPanel {
 	private javax.swing.JButton getWakeupButton() {
 		if(wakeupButton == null) {
 			wakeupButton = new javax.swing.JButton();
-			wakeupButton.setText(Messages.getString("button.wakeup.label")); //$NON-NLS-1$
-			wakeupButton.setToolTipText(Messages.getString("button.wakeup.tooltip"));
+			wakeupButton.setText(Messages.UI_MESSAGES.getString("button.wakeup.label")); //$NON-NLS-1$
+			wakeupButton.setToolTipText(Messages.UI_MESSAGES.getString("button.wakeup.tooltip"));
 			wakeupButton.addActionListener(new java.awt.event.ActionListener() { 
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					getEditHostPanel().applyChanges();
@@ -432,7 +432,7 @@ public class MainPanel extends JPanel {
 	private javax.swing.JLabel getConfigurationsLabel() {
 		if(configurationsLabel == null) {
 			configurationsLabel = new javax.swing.JLabel();
-			configurationsLabel.setText(Messages.getString("configurations.label")); //$NON-NLS-1$
+			configurationsLabel.setText(Messages.UI_MESSAGES.getString("configurations.label")); //$NON-NLS-1$
 			configurationsLabel.setLabelFor(getConfigurationsList());
 		}
 		return configurationsLabel;
@@ -441,8 +441,8 @@ public class MainPanel extends JPanel {
 	private javax.swing.JButton getNewButton() {
 		if(newButton == null) {
 			newButton = new javax.swing.JButton();
-			newButton.setText(Messages.getString("button.new.label")); //$NON-NLS-1$
-			newButton.setToolTipText(Messages.getString("button.new.tooltip"));
+			newButton.setText(Messages.UI_MESSAGES.getString("button.new.label")); //$NON-NLS-1$
+			newButton.setToolTipText(Messages.UI_MESSAGES.getString("button.new.tooltip"));
 			newButton.addActionListener(new java.awt.event.ActionListener() { 
 				public void actionPerformed(java.awt.event.ActionEvent e) {    
 					newHost();
@@ -460,8 +460,8 @@ public class MainPanel extends JPanel {
 	private javax.swing.JButton getDeleteButton() {
 		if(deleteButton == null) {
 			deleteButton = new javax.swing.JButton();
-			deleteButton.setText(Messages.getString("button.delete.label")); //$NON-NLS-1$
-			deleteButton.setToolTipText(Messages.getString("button.delete.tooltip"));
+			deleteButton.setText(Messages.UI_MESSAGES.getString("button.delete.label")); //$NON-NLS-1$
+			deleteButton.setToolTipText(Messages.UI_MESSAGES.getString("button.delete.tooltip"));
 			deleteButton.addActionListener(new java.awt.event.ActionListener() { 
 				public void actionPerformed(java.awt.event.ActionEvent e) {    
 					int[] indices = getConfigurationsList().getSelectedIndices();
@@ -544,7 +544,7 @@ public class MainPanel extends JPanel {
 		}
 
 		public int newHost() {
-			Host newHost = new Host(getNewName(Messages.getString("defaultConfigurationName")));
+			Host newHost = new Host(getNewName(Messages.UI_MESSAGES.getString("defaultConfigurationName")));
 			
 			newHost.addPropertyChangeListener(this);
 			int index;
@@ -606,6 +606,9 @@ public class MainPanel extends JPanel {
 
 /*
  * $Log: MainPanel.java,v $
+ * Revision 1.7  2004/04/15 10:21:36  gon23
+ * New Resources handling
+ *
  * Revision 1.6  2004/04/14 22:14:49  gon23
  * *** empty log message ***
  *
