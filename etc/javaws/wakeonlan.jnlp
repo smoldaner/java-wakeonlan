@@ -10,12 +10,14 @@
     <description>A tool to wake up wake-on-lan (wol) enabled machiens.</description>
     <description kind="short">A tool to wake up wake-on-lan (wol) enabled machiens.</description>
     <offline-allowed/>
+    <icon href="wakeonlan64x64.gif"/>
   </information>
   <security>
-      <all-permissions/>
+      <!--all-permissions/-->
   </security>
   <resources>
-    <j2se version="1.4.2"/>
+    <j2se version="1.4+"/>
+    <jar href="wakeonlan.jar"/>
   </resources>
-  <application-desc main-class="wol.WakeOnLan"/>
+  <application-desc main-class="wol.WakeOnLanApplet"/>
 </jnlp> 

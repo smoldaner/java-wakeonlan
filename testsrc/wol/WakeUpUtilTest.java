@@ -1,5 +1,5 @@
 /*
- * $Id: WakeUpUtilTest.java,v 1.1 2004/04/16 09:24:53 gon23 Exp $
+ * $Id: WakeUpUtilTest.java,v 1.2 2004/05/17 21:59:17 gon23 Exp $
  */
 package wol;
 
@@ -11,6 +11,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
+
+import wol.configuration.EthernetAddress;
+import wol.configuration.IllegalEthernetAddressException;
 
 import junit.framework.TestCase;
 
@@ -110,6 +113,9 @@ public class WakeUpUtilTest extends TestCase {
 
 /*
  * $Log: WakeUpUtilTest.java,v $
+ * Revision 1.2  2004/05/17 21:59:17  gon23
+ * *** empty log message ***
+ *
  * Revision 1.1  2004/04/16 09:24:53  gon23
  * Initial test sources
  *
