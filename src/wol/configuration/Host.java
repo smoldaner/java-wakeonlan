@@ -1,5 +1,5 @@
 /*
- * $Id: Host.java,v 1.3 2004/04/14 22:14:49 gon23 Exp $
+ * $Id: Host.java,v 1.4 2004/04/15 22:57:44 gon23 Exp $
  */
 package wol.configuration;
 
@@ -13,7 +13,7 @@ public class Host {
 	private String comment = "";
 	private String name = "";
 	private String host = "255.255.255.255";
-	private String hwAdress ="";
+	private String ethernetAddress ="";
 	private int port = 9;
 	private PropertyChangeSupport pcs;
 	
@@ -31,8 +31,8 @@ public class Host {
 		return host;
 	}
 
-	public String getHwAdress() {
-		return hwAdress;
+	public String getEthernetAddress() {
+		return ethernetAddress;
 	}
 
 	public String getName() {
@@ -50,11 +50,11 @@ public class Host {
 		pcs.firePropertyChange("host", oldValue, host);
 	}
 
-	public void setHwAdress(String hwAdress) {
-		String oldValue = this.hwAdress;
+	public void setEthernetAddress(String ethernetAddress) {
+		String oldValue = this.ethernetAddress;
 		
-		this.hwAdress = hwAdress;
-		pcs.firePropertyChange("hwAdress", oldValue, hwAdress);
+		this.ethernetAddress = ethernetAddress;
+		pcs.firePropertyChange("ethernetAddress", oldValue, ethernetAddress);
 	}
 
 	public void setName(String name) {
@@ -138,12 +138,12 @@ public class Host {
 			}
 		}
 		
-		if (null != this.hwAdress) {
-			if (!this.hwAdress.equals(other.hwAdress)) {
+		if (null != this.ethernetAddress) {
+			if (!this.ethernetAddress.equals(other.ethernetAddress)) {
 				return false;
 			}
 		} else {
-			if (null != other.hwAdress) {
+			if (null != other.ethernetAddress) {
 				return false;
 			}
 		}
@@ -168,6 +168,9 @@ public class Host {
 
 /*
  * $Log: Host.java,v $
+ * Revision 1.4  2004/04/15 22:57:44  gon23
+ * *** empty log message ***
+ *
  * Revision 1.3  2004/04/14 22:14:49  gon23
  * *** empty log message ***
  *

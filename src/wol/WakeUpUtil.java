@@ -1,5 +1,5 @@
 /*
- * $Id: WakeUpUtil.java,v 1.3 2004/04/14 22:12:31 gon23 Exp $
+ * $Id: WakeUpUtil.java,v 1.4 2004/04/15 22:57:57 gon23 Exp $
  */
 package wol;
 
@@ -8,51 +8,37 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.text.MessageFormat;
-import java.util.ResourceBundle;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * A class to wake up wake-on-lan enabled machines.
-  * <br>
- * <br>
- * Examples:
- * <blockqoute>
- * <pre>
- * try {
- *    //Creates a new WakeUpUtil instance using the local subnet broadcast address
- *    WakeUpUtil wakeUpUtil = new WakeUpUtil("192.168.0.255");
- * 		
- *    //wakes up the machine with the hardware address '00:50:95:10:95:F5', listening on port 9 in the local subnet
- *    wakeUpUtil.wakeup("00:50:95:10:95:F5");
- * } catch(Exception e) {
- *	   System.err.println("Ups..."); 
- * }
- * </pre>
- * </blockqoute>
- * <br>
  * 
  * @author <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#115;&#46;&#109;&#111;&#108;&#100;&#97;&#110;&#101;&#114;&#64;&#103;&#109;&#120;&#46;&#110;&#101;&#116;">Steffen Moldaner</a>
-  */
+ */
 public class WakeUpUtil {
 	/**
-	 * The default host: 255.255.255.255 (limited broadcast address).
+	 * The default wakeup host: 255.255.255.255 (limited broadcast address).
 	 */
-	public final static String DEFAULT_HOST = "255.255.255.255";
+	public final static InetAddress DEFAULT_HOST;
+	
+	//this is ugly
+	static {
+		InetAddress tmpInetAddress = null;
+		
+		try {
+			tmpInetAddress = InetAddress.getByName("255.255.255.255");
+		} catch (UnknownHostException e) {
+			 //should not happen, because this _is_ a valid IP!
+		}
+		
+		DEFAULT_HOST = tmpInetAddress;
+	}
+	
 	/**
-	 * The default port: 9.
+	 * The default wakeup port: 9
 	 */
 	public final static int DEFAULT_PORT = 9;
 	
-	
-	private final static String HARDWARE_ADDRESS_DELIM = ":";
-	private final static Logger LOG = Logger.getLogger(WakeUpUtil.class.getName());
-	
-	private ResourceBundle bundle = ResourceBundle.getBundle("wol.Resources");
-	
-	private final static byte[] STATIC_BYTES = new byte[] {
+	private final static byte[] SYNCHRONIZATION_STREAM_BYTES = new byte[] {
 		(byte) 0xff, 
 		(byte) 0xff, 
 		(byte) 0xff, 
@@ -61,159 +47,97 @@ public class WakeUpUtil {
 		(byte) 0xff 
 	};
 	
-	private InetAddress host;
-	private int port;
+	private WakeUpUtil() {
+		super();
+	}
 	
 	/**
-	 * Creates a new Instance of WakeUpUtil, using the default host and port.
-	 * @throws UnknownHostException if the default host is unknown
+	 * Wakes up the machine with the provided eternet address, using the default port and host.
+	 * 
+	 * @param ethernetAddress the ethernet address to wake up
+	 * @throws IOException if an I/O error occurs
 	 * @see #DEFAULT_HOST
 	 * @see #DEFAULT_PORT
-	 */	
-	public WakeUpUtil() throws UnknownHostException {
-		this(DEFAULT_HOST, DEFAULT_PORT);
+	 */
+	public static void wakeup(EthernetAddress ethernetAddress) throws IOException {
+		WakeUpUtil.wakeup(new EthernetAddress[]{ ethernetAddress });
 	}
-	
 	/**
-	 * Creates a new Instance of WakeUpUtil, using the default port.
+	 * Wakes up the machines with the provided ethernet addresses, using the default port and host.
 	 * 
-	 * @param host the host, the 'magic packets' wil be send
-	 * @throws UnknownHostException if the host is unknown
+	 * @param ethernetAddresses the ethernet addresses to wake up
+	 * @throws IOException if an I/O error occurs
+	 * @see #DEFAULT_HOST
 	 * @see #DEFAULT_PORT
 	 */
-	public WakeUpUtil(String host) throws UnknownHostException {
-		this(host, DEFAULT_PORT);
+	public static void wakeup(EthernetAddress[] ethernetAddresses) throws IOException {
+		WakeUpUtil.wakeup(ethernetAddresses, DEFAULT_HOST);
 	}
 	
 	/**
-	 * Creates a new Instance of WakeUpUtil, using the default host.
+	 * Wakes up the machine with the provided ethernet addresses, using the default port.
 	 * 
-	 * @param port the port the 'magic packets' wil be send
-	 * @throws UnknownHostException if the default host is unknown
-	 * @see #DEFAULT_HOST 
-	 */
-	public WakeUpUtil(int port) throws UnknownHostException {
-		this(DEFAULT_HOST, port);
-	}
-	
-	/**
-	 * Creates a new Instance of WakeUpUtil with the given host and port.
-	 * 
-	 * @param host the host, the 'magic packets' wil be send 
-	 * @param port the port the 'magic packets' wil be send
-	 * @throws UnknownHostException if the host is unknown
-	 */
-	public WakeUpUtil(String host, int port) throws UnknownHostException {
-		this(InetAddress.getByName(host), port);
-	}
-	
-	/**
-	 * Creates a new instance of WakeUpUtil  using the given <code>InetAddress</code>.
-	 * 
-	 * @param host an <code>InetAddress</code> representing the host, the 'magic packets' wil be send
+	 * @param ethernetAddress the ethernet address to wake up
+	 * @param host the host, the magic sequence will be send to
+	 * @throws IOException if an I/O error occurs
 	 * @see #DEFAULT_PORT
 	 */
-	public WakeUpUtil(InetAddress host) {
-		this(host, DEFAULT_PORT);
-	}
-	
-	
-	/**
-	 * Creates a new instance of WakeUpUtil  using the given <code>InetAddress</code> and port.
-	 * 
-	 * @param host an <code>InetAddress</code> representing the host, the 'magic packets' wil be send
-	 * @param port the port the 'magic packets' wil be send
-	 */
-	public WakeUpUtil(InetAddress host, int port) {
-		super();
-		
-		if (LOG.isLoggable(Level.FINE)) {
-			LOG.fine("Creating new WakeUpUtil instance; host=" + host.toString() + ", port=" + port);
-		}
-		
-		this.host = host;
-		this.port = port;
+	public static void wakeup(EthernetAddress ethernetAddress, InetAddress host) throws IOException {
+		WakeUpUtil.wakeup(new EthernetAddress[]{ ethernetAddress }, host);
 	}
 	
 	/**
-	 * Wakes up the machines with the given hardware addresses.
 	 * 
-	 * @param hwAddresses an array containg the hardware addresses of the machines
-	 * @throws UnknownHostException if the host does not exist
-	 * @throws IOException if an exception occures opening the socket or writing the 'magic packet'
+	 * @param ethernetAddresses the ethernet addresses to wake up
+	 * @param host the host, the magic sequence will be send to
+	 * @throws IOException if an I/O error occurs
+	 * @see #DEFAULT_PORT
 	 */
-	public void wakeUp(String[] hwAddresses) throws IOException {
+	public static void wakeup(EthernetAddress[] ethernetAddresses, InetAddress host) throws IOException {
+			WakeUpUtil.wakeup(ethernetAddresses, host, DEFAULT_PORT);	
+	}
+	
+	/**
+	 * 
+	 * @param ethernetAddress the ethernet address to wake up
+	 * @param host the host, the magic sequence will be send to
+	 * @param port the port number
+	 * @throws IOException if an I/O error occurs
+	 */
+	public static void wakeup(EthernetAddress ethernetAddress, InetAddress host, int port) throws IOException {
+		WakeUpUtil.wakeup(new EthernetAddress[]{ ethernetAddress }, host, port);		
+	}
+	
+	/**
+	 * 
+	 * @param ethernetAddresses the ethernet addresses to wake up
+	 * @param host the host, the magic sequence will be send to
+	 * @param port the port number
+	 * @throws IOException if an I/O error occurs
+	 */
+	public static void wakeup(EthernetAddress[] ethernetAddresses, InetAddress host, int port) throws IOException {
 		DatagramSocket socket = new DatagramSocket();
 		
-		for (int i = 0; i < hwAddresses.length; i++) {
-			byte[] hwAddressBytes = parseHardwareAddress(hwAddresses[i]);
-			byte[] magicBytes = new byte[6 + 16 * hwAddressBytes.length];
+		for (int i = 0; i < ethernetAddresses.length; i++) {
+			byte[] ethernetAddressBytes = ethernetAddresses[i].toBytes();
+			byte[] magicBytes = new byte[6 + 16 * ethernetAddressBytes.length];
 			
-			System.arraycopy(STATIC_BYTES, 0, magicBytes, 0, STATIC_BYTES.length);
+			System.arraycopy(SYNCHRONIZATION_STREAM_BYTES, 0, magicBytes, 0, SYNCHRONIZATION_STREAM_BYTES.length);
 	        
-			for (int j = 6; j < magicBytes.length; j += hwAddressBytes.length) {
-				System.arraycopy(hwAddressBytes, 0, magicBytes, j, hwAddressBytes.length);
+			for (int j = 6; j < magicBytes.length; j += ethernetAddressBytes.length) {
+				System.arraycopy(ethernetAddressBytes, 0, magicBytes, j, ethernetAddressBytes.length);
 			}
 			
 			DatagramPacket packet = new DatagramPacket(magicBytes, magicBytes.length, host, port);
 			
-			if (LOG.isLoggable(Level.INFO)) {
-				LOG.info(MessageFormat.format(bundle.getString("magicPacket.send"), new Object[]{hwAddresses[i]}));
-			}
-			
 			socket.send(packet);
 		}
-		
-		if (LOG.isLoggable(Level.INFO)) {
-			LOG.info(MessageFormat.format(bundle.getString("magicPacket.finished"), new Object[]{new Integer(hwAddresses.length)}));
-		}
-		
-		socket.close();
-	}
-	
-	
-	
-	/**
-	 * Wakes up the machine with the given hardware address.
-	 * 
-	 * @param hwAddress the hardware address of the machine
-	 * @throws UnknownHostException if the host does not exist
-	 * @throws IOException if an exception occures opening the socket or writing the 'magic packet'
-	 */
-	public void wakeUp(String hwAddress) throws IOException {
-		wakeUp(new String[] {hwAddress});
-	}
-	
-	/**
-	 * Parses a String representing a hardware address into an byte array. The String must be a list 
-	 * of hexadecimal bytes, sepeartet by a colon.<br><br> 
-	 * Example: 00:50:95:10:95:F5
-	 * 
-	 * @param hwAddress a String representation of the hardware address. 
-	 * @return a byte array containing the byte representation of the hardware address
-	 */
-	protected byte[] parseHardwareAddress(String hwAddress) {
-		StringTokenizer tokenizer = new StringTokenizer(hwAddress, HARDWARE_ADDRESS_DELIM);
-		
-		byte[] hwAddressBytes = new byte[tokenizer.countTokens()];
-		
-		for(int i=0; i < hwAddressBytes.length; i++) {
-			hwAddressBytes[i] = (byte) Integer.parseInt(tokenizer.nextToken(), 16);
-		}
-		
-		return hwAddressBytes;
 	}
 }
 
 /*
  * $Log: WakeUpUtil.java,v $
- * Revision 1.3  2004/04/14 22:12:31  gon23
- * Replaced commons logging with jdk logging
- *
- * Revision 1.2  2003/09/24 15:30:18  gon23
- * javadoc email spamblock
- *
- * Revision 1.1  2003/09/01 07:10:41  gon23
- * Initial
+ * Revision 1.4  2004/04/15 22:57:57  gon23
+ * *** empty log message ***
  *
  */

@@ -1,5 +1,5 @@
 /*
- * $Id: EditHostPanel.java,v 1.5 2004/04/15 10:21:36 gon23 Exp $
+ * $Id: EditHostPanel.java,v 1.6 2004/04/15 22:57:57 gon23 Exp $
  */
 package wol.ui;
 
@@ -32,8 +32,8 @@ public class EditHostPanel extends JPanel {
 	private javax.swing.JTextField hostTextField = null;
 	private javax.swing.JLabel portLabel = null;
 	private JTextField portTextField = null;
-	private javax.swing.JLabel hwAdressLabel = null;
-	private javax.swing.JTextField hwAdressTextField = null;
+	private javax.swing.JLabel ethernetAddressLabel = null;
+	private javax.swing.JTextField ethernetAddressTextField = null;
 	private javax.swing.JLabel commentLabel = null;
 	private javax.swing.JScrollPane commentScrollPane = null;
 	private javax.swing.JTextArea commentTextArea = null;
@@ -118,12 +118,12 @@ public class EditHostPanel extends JPanel {
 			java.awt.GridBagConstraints nameTextFieldConstraints = new java.awt.GridBagConstraints();
 			java.awt.GridBagConstraints hostTextFieldConstraints = new java.awt.GridBagConstraints();
 			java.awt.GridBagConstraints portTextFieldConstraints = new java.awt.GridBagConstraints();
-			java.awt.GridBagConstraints hwAdressTextFieldConstraints = new java.awt.GridBagConstraints();
+			java.awt.GridBagConstraints ethernetAddressTextFieldConstraints = new java.awt.GridBagConstraints();
 			java.awt.GridBagConstraints portLabelConstraints = new java.awt.GridBagConstraints();
 			java.awt.GridBagConstraints hostLabelConstraints = new java.awt.GridBagConstraints();
 			java.awt.GridBagConstraints commentLabelConstraints = new java.awt.GridBagConstraints();
 			java.awt.GridBagConstraints commentTextFieldConstraints = new java.awt.GridBagConstraints();
-			java.awt.GridBagConstraints hwAdressLabelConstraints = new java.awt.GridBagConstraints();
+			java.awt.GridBagConstraints ethernetAddressLabelConstraints = new java.awt.GridBagConstraints();
 			Insets insets = new Insets(1, 2, 1, 2);
 			
 			nameLabelConstraints.gridx = 0;
@@ -139,20 +139,20 @@ public class EditHostPanel extends JPanel {
 			nameTextFieldConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			nameTextFieldConstraints.insets = new Insets(0, 2, 0, 2);
 			
-			hwAdressLabelConstraints.gridx = 0;
-			hwAdressLabelConstraints.gridy = 1;
-			hwAdressLabelConstraints.gridwidth = GridBagConstraints.REMAINDER;
-			hwAdressLabelConstraints.weighty = 0.4D;
-			hwAdressLabelConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
-			hwAdressLabelConstraints.insets = insets;
+			ethernetAddressLabelConstraints.gridx = 0;
+			ethernetAddressLabelConstraints.gridy = 1;
+			ethernetAddressLabelConstraints.gridwidth = GridBagConstraints.REMAINDER;
+			ethernetAddressLabelConstraints.weighty = 0.4D;
+			ethernetAddressLabelConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
+			ethernetAddressLabelConstraints.insets = insets;
 			
-			hwAdressTextFieldConstraints.weightx = 1.0;
-			hwAdressTextFieldConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-			hwAdressTextFieldConstraints.gridx = 0;
-			hwAdressTextFieldConstraints.gridy = 2;
-			hwAdressTextFieldConstraints.gridwidth = GridBagConstraints.REMAINDER;
-			hwAdressTextFieldConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			hwAdressTextFieldConstraints.insets = insets;
+			ethernetAddressTextFieldConstraints.weightx = 1.0;
+			ethernetAddressTextFieldConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+			ethernetAddressTextFieldConstraints.gridx = 0;
+			ethernetAddressTextFieldConstraints.gridy = 2;
+			ethernetAddressTextFieldConstraints.gridwidth = GridBagConstraints.REMAINDER;
+			ethernetAddressTextFieldConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			ethernetAddressTextFieldConstraints.insets = insets;
 			
 			hostLabelConstraints.gridx = 0;
 			hostLabelConstraints.gridy = 3;
@@ -202,8 +202,8 @@ public class EditHostPanel extends JPanel {
 			editPanel.add(getHostTextField(), hostTextFieldConstraints);
 			editPanel.add(getPortLabel(), portLabelConstraints);
 			editPanel.add(getPortTextField(), portTextFieldConstraints);
-			editPanel.add(getHwAdressLabel(), hwAdressLabelConstraints);
-			editPanel.add(getHwAdressTextField(), hwAdressTextFieldConstraints);
+			editPanel.add(getEthernetAddressLabel(), ethernetAddressLabelConstraints);
+			editPanel.add(getEthernetAddressTextField(), ethernetAddressTextFieldConstraints);
 			editPanel.add(getCommentLabel(), commentLabelConstraints);
 			editPanel.add(getCommentScrollPane(), commentTextFieldConstraints);
 		}
@@ -285,7 +285,7 @@ public class EditHostPanel extends JPanel {
 			
 			config.setPort(port);
 			config.setHost(getHostTextField().getText());
-			config.setHwAdress(getHwAdressTextField().getText());
+			config.setEthernetAddress(getEthernetAddressTextField().getText());
 			config.setName(getNameTextField().getText());
 			config.setComment(getCommentTextArea().getText());
 			
@@ -372,20 +372,20 @@ public class EditHostPanel extends JPanel {
 		return portTextField;
 	}
 
-	private javax.swing.JLabel getHwAdressLabel() {
-		if (hwAdressLabel == null) {
-			hwAdressLabel = new javax.swing.JLabel();
-			hwAdressLabel.setText(Messages.UI_MESSAGES.getString("hwAdress.label")); //$NON-NLS-1$
-			hwAdressLabel.setLabelFor(getHwAdressTextField());
+	private javax.swing.JLabel getEthernetAddressLabel() {
+		if (ethernetAddressLabel == null) {
+			ethernetAddressLabel = new javax.swing.JLabel();
+			ethernetAddressLabel.setText(Messages.UI_MESSAGES.getString("ethernetAddress.label")); //$NON-NLS-1$
+			ethernetAddressLabel.setLabelFor(getEthernetAddressTextField());
 		}
-		return hwAdressLabel;
+		return ethernetAddressLabel;
 	}
 
-	private javax.swing.JTextField getHwAdressTextField() {
-		if (hwAdressTextField == null) {
-			hwAdressTextField = new javax.swing.JTextField();
-			hwAdressTextField.setToolTipText(Messages.UI_MESSAGES.getString("hwAdress.tooltip"));
-			hwAdressTextField.addKeyListener(new KeyAdapter() {
+	private javax.swing.JTextField getEthernetAddressTextField() {
+		if (ethernetAddressTextField == null) {
+			ethernetAddressTextField = new javax.swing.JTextField();
+			ethernetAddressTextField.setToolTipText(Messages.UI_MESSAGES.getString("ethernetAddress.tooltip"));
+			ethernetAddressTextField.addKeyListener(new KeyAdapter() {
 				public void keyTyped(KeyEvent e) {
 					SwingUtilities.invokeLater(new Runnable() {
 						public void run() {
@@ -395,10 +395,10 @@ public class EditHostPanel extends JPanel {
 					
 				}
 			});
-			hwAdressTextField.setEnabled(false);
+			ethernetAddressTextField.setEnabled(false);
 		}
 
-		return hwAdressTextField;
+		return ethernetAddressTextField;
 	}
 
 	private void updateFromConfig() {
@@ -409,20 +409,20 @@ public class EditHostPanel extends JPanel {
 			getHostTextField().setText(currentConfig.getHost());
 			getNameTextField().setText(currentConfig.getName());
 			getPortTextField().setText(currentConfig.getPort() > 0 ? String.valueOf(currentConfig.getPort()) : null);
-			getHwAdressTextField().setText(currentConfig.getHwAdress());
+			getEthernetAddressTextField().setText(currentConfig.getEthernetAddress());
 			getCommentTextArea().setText(currentConfig.getComment());
 		} else {
 			getHostTextField().setText(null);
 			getNameTextField().setText(null);
 			getPortTextField().setText(null);
-			getHwAdressTextField().setText(null);
+			getEthernetAddressTextField().setText(null);
 			getCommentTextArea().setText(null);
 		}
 
 		getHostTextField().setEnabled(enabled);
 		getNameTextField().setEnabled(enabled);
 		getPortTextField().setEnabled(enabled);
-		getHwAdressTextField().setEnabled(enabled);
+		getEthernetAddressTextField().setEnabled(enabled);
 		getCommentTextArea().setEnabled(enabled);
 		
 		checkButtonStates();
@@ -489,7 +489,7 @@ public class EditHostPanel extends JPanel {
 			return true;
 		}
 		
-		if (!getHwAdressTextField().getText().equals(config.getHwAdress())) {
+		if (!getEthernetAddressTextField().getText().equals(config.getEthernetAddress())) {
 			return true;
 		}
 		
@@ -515,6 +515,9 @@ public class EditHostPanel extends JPanel {
 
 /*
  * $Log: EditHostPanel.java,v $
+ * Revision 1.6  2004/04/15 22:57:57  gon23
+ * *** empty log message ***
+ *
  * Revision 1.5  2004/04/15 10:21:36  gon23
  * New Resources handling
  *

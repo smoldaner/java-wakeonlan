@@ -1,5 +1,5 @@
 /*
- * $Id: WakeOnLan.java,v 1.5 2004/04/15 10:22:06 gon23 Exp $
+ * $Id: WakeOnLan.java,v 1.6 2004/04/15 22:57:57 gon23 Exp $
  */
 package wol;
 
@@ -8,6 +8,9 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -25,6 +28,7 @@ import com.martiansoftware.jsap.stringparsers.IntegerStringParser;
 import com.martiansoftware.jsap.stringparsers.StringStringParser;
 
 import wol.configuration.Configuration;
+import wol.configuration.Host;
 import wol.resources.Messages;
 import wol.ui.MainPanel;
 
@@ -48,37 +52,87 @@ public class WakeOnLan {
 	private static final String CMD_DEBUG = "debug";
 	private static final String CMD_ADDRESSES = "addresses";
 	
-	public WakeOnLan(JSAPResult config) throws JSAPException, IOException {
+	public WakeOnLan(JSAPResult cmdConfig) throws JSAPException, IOException {
 		super();
 		
-		if (!config.success()) {
+		if (!cmdConfig.success()) {
 			printHelpAndExit();
 		}
 		
-		if (config.getBoolean(CMD_HELP)) {
+		if (cmdConfig.getBoolean(CMD_HELP)) {
 			printHelpAndExit();
 		}
 		
-		if (config.getBoolean(CMD_VERSION)) {
+		if (cmdConfig.getBoolean(CMD_VERSION)) {
 			printVersionAndExit();
 		}
 		
-		int port = config.getInt(CMD_PORT);
-		InetAddress host = config.getInetAddress(CMD_INET_ADDRESS);
+		String[] machines = cmdConfig.getStringArray(CMD_ADDRESSES); 
+		String configPath = cmdConfig.getString(CMD_CONFIG_FILE);
+		Configuration config = new Configuration(configPath);
 		
-		String[] hardwareAddresses = config.getStringArray(CMD_ADDRESSES); 
-		
-		
-		if (null == hardwareAddresses || 0 == hardwareAddresses.length) {
-			showGUI();
+		if (null == machines || 0 == machines.length) {
+			showGUI(config);
 		} else {
-			WakeUpUtil wakeOnLan = new WakeUpUtil(host, port);
-		
-			wakeOnLan.wakeUp(hardwareAddresses);
+		 	InetAddress host = cmdConfig.getInetAddress(CMD_INET_ADDRESS);
+		 	int port = cmdConfig.getInt(CMD_PORT);
+		 	
+			wakeup(machines, config, host, port);
 		}
 	}
 	
-	private void showGUI() {
+	private void wakeup(String[] names, Configuration config, InetAddress host, int port) {
+		Host[] hosts = config.getHosts();
+		HashMap hostMap = new HashMap(hosts.length);
+		
+		for (int i = 0; i < hosts.length; i++) {
+			Host hostConfig = hosts[i];
+			hostMap.put(hostConfig.getName(), hostConfig);
+		}
+		
+		for (int i = 0; i < names.length; i++) {
+			String name = names[i];
+			Host hostConfig = (Host) hostMap.get(name);
+				if (null != host) {
+					wakeupConfig(hostConfig);
+				} else {
+					try {
+						wakeupEthernetAddresses(name, host, port);
+					} catch (IllegalEthernetAddressException e) {
+						Messages.ERROR_MESSAGES.getFormattedString(
+								"wakeup.notAHostOrEthernetAddress",
+								name);
+					}
+				}
+		}
+	}
+	
+	private void wakeupConfig(Host host) {
+		try {
+			EthernetAddress ethernetAddress = new EthernetAddress(host.getEthernetAddress());
+			InetAddress hostAddress = InetAddress.getByName(host.getHost());
+			WakeUpUtil.wakeup(ethernetAddress, hostAddress, host.getPort());
+		} catch (IOException e) {
+			System.err.println(
+					Messages.ERROR_MESSAGES.getFormattedString("wakeup.io", host.getHost(), String.valueOf(host.getPort())));
+		} catch (IllegalEthernetAddressException e) {
+			//should not happen
+			System.err.println(
+					Messages.ERROR_MESSAGES.getFormattedString("wakeup.invalidEthernetAddress", host.getHost(), String.valueOf(host.getPort())));
+		}
+	}
+	
+	private void wakeupEthernetAddresses(String address, InetAddress host, int port) throws IllegalEthernetAddressException {
+		try {
+			EthernetAddress ethernetAddress = new EthernetAddress(address);
+			WakeUpUtil.wakeup(ethernetAddress, host, port);
+		} catch (IOException e) {
+			System.err.println(
+					Messages.ERROR_MESSAGES.getFormattedString("wakeup.io", host.toString(), String.valueOf(port)));
+		}
+	}
+	
+	private void showGUI(Configuration config) {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
@@ -86,7 +140,6 @@ public class WakeOnLan {
 		}
 		
 		JFrame frame = new JFrame("Wakeonlan");
-		Configuration config = new Configuration(getConfigFile());
 		final MainPanel mainPanel = new MainPanel(config);
 		
 		mainPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
@@ -100,10 +153,17 @@ public class WakeOnLan {
 		frame.show();
 	}
 	
-	private File getConfigFile() {
-		String home = System.getProperty("user.home");
+	private static String getConfigFilePath() {
+		StringBuffer buffer = new StringBuffer(System.getProperty("user.home"));
 		
-		return new File(new File(home), ".wakeonlan.hosts");
+		buffer.append(File.separatorChar);
+		buffer.append(".wakeonlan.hosts");
+		
+		return buffer.toString();
+	}
+	
+	private static File getConfigFile() {
+		return new File(getConfigFilePath());
 	}
 	
 	/**
@@ -154,15 +214,15 @@ public class WakeOnLan {
 	protected static JSAP getOptions() throws JSAPException {
 		JSAP jsap = new JSAP();
 		
-		FlaggedOption inetAdress = new FlaggedOption(CMD_INET_ADDRESS)
+		FlaggedOption inetAddress = new FlaggedOption(CMD_INET_ADDRESS)
 			.setStringParser(new InetAddressStringParser())
 			.setDefault("255.255.255.255")
 			.setRequired(false)
 			.setShortFlag('i')
 			.setLongFlag("inet-address");
 		
-		inetAdress.setHelp(Messages.CMD_MESSAGES.getString("cmdline.description.inet-address"));
-		jsap.registerParameter(inetAdress);
+		inetAddress.setHelp(Messages.CMD_MESSAGES.getString("cmdline.description.inet-address"));
+		jsap.registerParameter(inetAddress);
 		
 		FlaggedOption port = new FlaggedOption(CMD_PORT)
 			.setStringParser(new IntegerStringParser())
@@ -177,6 +237,7 @@ public class WakeOnLan {
 		FlaggedOption config = new FlaggedOption(CMD_CONFIG_FILE)
 			.setStringParser(new StringStringParser())
 			.setRequired(false)
+			.setDefault(getConfigFilePath())
 			.setShortFlag('c')
 			.setLongFlag("config");
 		
@@ -217,6 +278,9 @@ public class WakeOnLan {
 
 /*
  * $Log: WakeOnLan.java,v $
+ * Revision 1.6  2004/04/15 22:57:57  gon23
+ * *** empty log message ***
+ *
  * Revision 1.5  2004/04/15 10:22:06  gon23
  * Replaced commons-cli with JSAP
  *
