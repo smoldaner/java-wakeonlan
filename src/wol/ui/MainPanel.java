@@ -1,5 +1,5 @@
 /*
- * $Id: MainPanel.java,v 1.9 2004/04/21 20:41:31 gon23 Exp $
+ * $Id: MainPanel.java,v 1.10 2004/04/21 22:44:12 gon23 Exp $
  */
 package wol.ui;
 
@@ -44,6 +44,8 @@ import wol.resources.Messages;
  * @author <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#115;&#46;&#109;&#111;&#108;&#100;&#97;&#110;&#101;&#114;&#64;&#103;&#109;&#120;&#46;&#110;&#101;&#116;">Steffen Moldaner</a>
  */
 public class MainPanel extends JPanel {
+	private JMenuItem aboutMenuItem;
+	private JMenu infoMenu;
 	private final static Logger LOG = Logger.getLogger(MainPanel.class.getName());
 	private EditHostPanel editHostPanel;
 	private javax.swing.JPanel buttonPanel = null;
@@ -111,6 +113,7 @@ public class MainPanel extends JPanel {
 		if (null == menuBar) {
 			menuBar = new JMenuBar();
 			menuBar.add(getFileMenu());
+			menuBar.add(getInfoMenu());
 		}
 		
 		return menuBar;
@@ -131,6 +134,30 @@ public class MainPanel extends JPanel {
 		}
 		
 		return fileMenu;
+	}
+	
+	private JMenu getInfoMenu() {
+		if (null == infoMenu) {
+			infoMenu = new JMenu(Messages.UI_MESSAGES.getString("menu.info.label"));
+			infoMenu.setMnemonic(Messages.UI_MESSAGES.getChar("menu.info.mnemonic"));
+			infoMenu.add(getAboutMenuItem());
+		}
+		
+		return infoMenu;
+	}
+	
+	private JMenuItem getAboutMenuItem() {
+		if (null == aboutMenuItem) {
+			aboutMenuItem = new JMenuItem(Messages.UI_MESSAGES.getString("menu.info.about.label"));
+			aboutMenuItem.setMnemonic(Messages.UI_MESSAGES.getChar("menu.info.about.mnemonic"));
+			aboutMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					JOptionPane.showMessageDialog(MainPanel.this, Messages.UI_MESSAGES.getString("about.message"), Messages.UI_MESSAGES.getString("about.title"), JOptionPane.INFORMATION_MESSAGE);
+				}
+			});
+		}
+		
+		return aboutMenuItem;
 	}
 	
 	private JMenuItem getOpenMenuItem() {
@@ -303,6 +330,16 @@ public class MainPanel extends JPanel {
 		if (null == exitMenuItem) {
 			exitMenuItem = new JMenuItem(Messages.UI_MESSAGES.getString("menu.file.exit.label"));
 			exitMenuItem.setMnemonic(Messages.UI_MESSAGES.getChar("menu.file.exit.mnemonic"));
+			exitMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					try {
+						saveConfig();
+					} catch (FileNotFoundException e1) {
+						LOG.warning(Messages.ERROR_MESSAGES.getString("save.fileNotFound.message"));
+					}
+					System.exit(0);
+				}
+			});
 		}
 		
 		return exitMenuItem;
@@ -654,6 +691,9 @@ public class MainPanel extends JPanel {
 
 /*
  * $Log: MainPanel.java,v $
+ * Revision 1.10  2004/04/21 22:44:12  gon23
+ * *** empty log message ***
+ *
  * Revision 1.9  2004/04/21 20:41:31  gon23
  * javadoc
  *

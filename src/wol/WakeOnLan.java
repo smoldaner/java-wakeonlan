@@ -1,11 +1,12 @@
 /*
- * $Id: WakeOnLan.java,v 1.7 2004/04/16 09:26:27 gon23 Exp $
+ * $Id: WakeOnLan.java,v 1.8 2004/04/21 22:44:07 gon23 Exp $
  */
 package wol;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.HashMap;
@@ -26,7 +27,7 @@ import com.martiansoftware.jsap.stringparsers.IntegerStringParser;
 import com.martiansoftware.jsap.stringparsers.StringStringParser;
 
 import wol.configuration.Configuration;
-import wol.configuration.Host;
+import wol.configuration.Machine;
 import wol.resources.Messages;
 import wol.ui.MainPanel;
 
@@ -80,17 +81,17 @@ public class WakeOnLan {
 	}
 	
 	private void wakeup(String[] names, Configuration config, InetAddress host, int port) {
-		Host[] hosts = config.getHosts();
+		Machine[] hosts = config.getMachines();
 		HashMap hostMap = new HashMap(hosts.length);
 		
 		for (int i = 0; i < hosts.length; i++) {
-			Host hostConfig = hosts[i];
+			Machine hostConfig = hosts[i];
 			hostMap.put(hostConfig.getName(), hostConfig);
 		}
 		
 		for (int i = 0; i < names.length; i++) {
 			String name = names[i];
-			Host hostConfig = (Host) hostMap.get(name);
+			Machine hostConfig = (Machine) hostMap.get(name);
 				if (null != host) {
 					wakeupConfig(hostConfig);
 				} else {
@@ -105,7 +106,7 @@ public class WakeOnLan {
 		}
 	}
 	
-	private void wakeupConfig(Host host) {
+	private void wakeupConfig(Machine host) {
 		try {
 			EthernetAddress ethernetAddress = new EthernetAddress(host.getEthernetAddress());
 			InetAddress hostAddress = InetAddress.getByName(host.getHost());
@@ -144,6 +145,11 @@ public class WakeOnLan {
 		frame.setContentPane(mainPanel);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
+				try {
+					mainPanel.saveConfig();
+				} catch (FileNotFoundException e1) {
+					LOG.warning(Messages.ERROR_MESSAGES.getString("save.fileNotFound.message"));
+				}
 				System.exit(0);
 			}
 		});
@@ -276,6 +282,9 @@ public class WakeOnLan {
 
 /*
  * $Log: WakeOnLan.java,v $
+ * Revision 1.8  2004/04/21 22:44:07  gon23
+ * *** empty log message ***
+ *
  * Revision 1.7  2004/04/16 09:26:27  gon23
  * *** empty log message ***
  *
