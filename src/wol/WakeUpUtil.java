@@ -1,5 +1,5 @@
 /*
- * $Id: WakeUpUtil.java,v 1.2 2003/09/24 15:30:18 gon23 Exp $
+ * $Id: WakeUpUtil.java,v 1.3 2004/04/14 22:12:31 gon23 Exp $
  */
 package wol;
 
@@ -11,9 +11,8 @@ import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A class to wake up wake-on-lan enabled machines.
@@ -49,7 +48,7 @@ public class WakeUpUtil {
 	
 	
 	private final static String HARDWARE_ADDRESS_DELIM = ":";
-	private final static Log log = LogFactory.getLog(WakeUpUtil.class);
+	private final static Logger LOG = Logger.getLogger(WakeUpUtil.class.getName());
 	
 	private ResourceBundle bundle = ResourceBundle.getBundle("wol.Resources");
 	
@@ -128,8 +127,8 @@ public class WakeUpUtil {
 	public WakeUpUtil(InetAddress host, int port) {
 		super();
 		
-		if (log.isDebugEnabled()) {
-			log.debug("Creating new WakeUpUtil instance; host=" + host.toString() + ", port=" + port);
+		if (LOG.isLoggable(Level.FINE)) {
+			LOG.fine("Creating new WakeUpUtil instance; host=" + host.toString() + ", port=" + port);
 		}
 		
 		this.host = host;
@@ -158,15 +157,15 @@ public class WakeUpUtil {
 			
 			DatagramPacket packet = new DatagramPacket(magicBytes, magicBytes.length, host, port);
 			
-			if (log.isInfoEnabled()) {
-				log.info(MessageFormat.format(bundle.getString("magicPacket.send"), new Object[]{hwAddresses[i]}));
+			if (LOG.isLoggable(Level.INFO)) {
+				LOG.info(MessageFormat.format(bundle.getString("magicPacket.send"), new Object[]{hwAddresses[i]}));
 			}
 			
 			socket.send(packet);
 		}
 		
-		if (log.isInfoEnabled()) {
-			log.info(MessageFormat.format(bundle.getString("magicPacket.finished"), new Object[]{new Integer(hwAddresses.length)}));
+		if (LOG.isLoggable(Level.INFO)) {
+			LOG.info(MessageFormat.format(bundle.getString("magicPacket.finished"), new Object[]{new Integer(hwAddresses.length)}));
 		}
 		
 		socket.close();
@@ -208,6 +207,9 @@ public class WakeUpUtil {
 
 /*
  * $Log: WakeUpUtil.java,v $
+ * Revision 1.3  2004/04/14 22:12:31  gon23
+ * Replaced commons logging with jdk logging
+ *
  * Revision 1.2  2003/09/24 15:30:18  gon23
  * javadoc email spamblock
  *
