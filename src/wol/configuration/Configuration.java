@@ -1,5 +1,5 @@
 /*
- * $Id: Configuration.java,v 1.7 2004/05/18 13:55:53 gon23 Exp $
+ * $Id: Configuration.java,v 1.8 2006/06/27 08:30:18 gon23 Exp $
  */
 package wol.configuration;
 
@@ -9,6 +9,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 /**
@@ -33,6 +36,24 @@ public class Configuration {
 	public Configuration(String path) {
 		this(new File(path));
 	}
+    
+    public Configuration(InputStream in) {
+        loadConfig(in);
+    }
+    
+    public Configuration(URL url) {
+        try {
+            loadConfig(url.openStream());
+        } catch (IOException e) {
+            String errMsg = "Could not load configuration";
+            
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.WARNING, errMsg, e);
+            } else {
+                LOG.warning(errMsg);
+            }
+        }
+    }
 	
 	/**
 	 * Creates a new configuration with the given file. If the file exists
@@ -47,7 +68,7 @@ public class Configuration {
 		
 		if (file.exists()) {
 			try {
-				loadConfig();
+				loadConfig(new FileInputStream(file));
 			} catch (FileNotFoundException e) {
 				String errMsg = "Could not load configuration";
 				
@@ -84,11 +105,10 @@ public class Configuration {
 	/**
 	 * Loads this configuration from the file returned by {@link #getFile()}.
 	 * 
-	 * @throws FileNotFoundException if the file does not exist.
 	 * @see #getFile()
 	 */
-	public void loadConfig() throws FileNotFoundException {
-		XMLDecoder decoder = new XMLDecoder(new FileInputStream(file));
+	public void loadConfig(InputStream in) {
+		XMLDecoder decoder = new XMLDecoder(in);
 		
 		try {
 			this.machines = (Machine[]) decoder.readObject();
@@ -145,6 +165,9 @@ public class Configuration {
 
 /*
  * $Log: Configuration.java,v $
+ * Revision 1.8  2006/06/27 08:30:18  gon23
+ * Added URL and stream constructor
+ *
  * Revision 1.7  2004/05/18 13:55:53  gon23
  * *** empty log message ***
  *
